@@ -78,10 +78,10 @@ window.OneSignalDeferred.push(async function (OneSignal) {
 /*************************************************
  * ENSURE PUSH IS ENABLED
  *************************************************/
-async function ensurePushEnabled() {
-  console.log("ensurePushEnabled()");
+async function ensurePushEnabledFromClick() {
+  console.log("ensurePushEnabledFromClick()");
 
-  // Block unsupported environments
+  // Hard blocks
   if (isFacebookBrowser || isInstagramBrowser) {
     showToast(
       isIOS
@@ -96,29 +96,24 @@ async function ensurePushEnabled() {
     return false;
   }
 
-  // ⏳ WAIT for OneSignal.init to complete
-  const OneSignal = await oneSignalReady;
-  console.log("OneSignal ready for permission");
-
+  // 🚨 CRITICAL: permission MUST be requested synchronously
   try {
     const permission = await OneSignal.Notifications.requestPermission();
-    console.log("Permission:", permission);
+    console.log("Permission result:", permission);
 
     if (!permission) {
       showToast("🔕 Notifications blocked in browser");
       return false;
     }
 
-    await OneSignal.User.PushSubscription.optIn();
-    console.log("Opted in:", OneSignal.User.PushSubscription.optedIn);
-
-    return OneSignal.User.PushSubscription.optedIn === true;
+    return true;
   } catch (e) {
-    console.error("ensurePushEnabled error", e);
-    showToast("❌ Failed to enable alerts");
+    console.error("Permission request failed", e);
+    showToast("❌ Failed to request permission");
     return false;
   }
 }
+
 
 /*************************************************
  * TOGGLE CHOKEPOINT SUBSCRIPTION
@@ -129,7 +124,7 @@ async function toggleChokepointSubscription(chokepointId) {
   const subs = getSubscriptions();
   const alreadySubscribed = subs.includes(chokepointId);
 
-  const enabled = await ensurePushEnabled();
+  const enabled = await ensurePushEnabledFromClick();
   if (!enabled) {
     console.log("Push not enabled, aborting");
     return;
