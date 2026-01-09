@@ -121,24 +121,30 @@ async function ensurePushEnabledFromClick() {
 async function toggleChokepointSubscription(chokepointId) {
   console.log("Clicked chokepoint:", chokepointId);
 
-  const subs = getSubscriptions();
-  const alreadySubscribed = subs.includes(chokepointId);
-
-  const enabled = await ensurePushEnabledFromClick();
-  if (!enabled) {
-    console.log("Push not enabled, aborting");
+  // 1️⃣ Permission — MUST happen immediately
+  const permissionOk = await ensurePushEnabledFromClick();
+  if (!permissionOk) {
+    console.log("Permission not granted, aborting");
     return;
   }
 
-  const OneSignal = await oneSignalReady;
+  // 2️⃣ Now we can safely await OneSignal init
+  const OneSignalInstance = await oneSignalReady;
+  console.log("OneSignal fully ready");
+
+  // 3️⃣ Ensure push subscription
+  await OneSignalInstance.User.PushSubscription.optIn();
+
+  const subs = getSubscriptions();
+  const alreadySubscribed = subs.includes(chokepointId);
 
   try {
     if (alreadySubscribed) {
-      await OneSignal.User.addTag(`cp_${chokepointId}`, "0");
+      await OneSignalInstance.User.addTag(`cp_${chokepointId}`, "0");
       saveSubscriptions(subs.filter(id => id !== chokepointId));
       showToast("🔕 Alerts disabled");
     } else {
-      await OneSignal.User.addTag(`cp_${chokepointId}`, "1");
+      await OneSignalInstance.User.addTag(`cp_${chokepointId}`, "1");
       saveSubscriptions([...subs, chokepointId]);
       showToast("🔔 Alerts enabled");
     }
@@ -149,6 +155,7 @@ async function toggleChokepointSubscription(chokepointId) {
     showToast("⚠️ Failed to update alerts");
   }
 }
+
 
 /*************************************************
  * LOAD CHOKEPOINTS
