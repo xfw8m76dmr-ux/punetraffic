@@ -109,6 +109,7 @@ async function ensurePushEnabled() {
  * TOGGLE CHOKEPOINT SUBSCRIPTION
  *************************************************/
 async function toggleChokepointSubscription(chokepointId) {
+  console.log("Clicked chokepoint:", chokepointId);
   const subs = getSubscriptions();
   const alreadySubscribed = subs.includes(chokepointId);
 
