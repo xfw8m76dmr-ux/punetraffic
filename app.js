@@ -20,7 +20,7 @@ function saveSubscriptions(list) {
 }
 
 /*************************************************
- * USER AGENT / ENV CHECKS (from your reference)
+ * USER AGENT / ENV CHECKS
  *************************************************/
 const ua = navigator.userAgent.toLowerCase();
 const isIOS = /iphone|ipad|ipod/.test(ua);
@@ -33,7 +33,7 @@ const isFacebookBrowser =
 const isInstagramBrowser = navigator.userAgent.includes("Instagram");
 
 /*************************************************
- * TOAST (unchanged, simplified slightly)
+ * TOAST
  *************************************************/
 function showToast(message) {
   const t = document.createElement("div");
@@ -53,9 +53,7 @@ function showToast(message) {
     z-index: 99999;
   `;
   document.body.appendChild(t);
-  requestAnimationFrame(() => {
-    t.style.opacity = 1;
-  });
+  requestAnimationFrame(() => (t.style.opacity = 1));
   setTimeout(() => {
     t.style.opacity = 0;
     setTimeout(() => t.remove(), 400);
@@ -63,36 +61,47 @@ function showToast(message) {
 }
 
 /*************************************************
- * ENSURE PUSH IS ENABLED (CORE NOTIFY FLOW)
+ * WAIT FOR ONESIGNAL (CRITICAL FIX)
+ *************************************************/
+function waitForOneSignal() {
+  return new Promise(resolve => {
+    if (!window.OneSignalDeferred) {
+      console.error("❌ OneSignalDeferred missing");
+      return resolve(null);
+    }
+    window.OneSignalDeferred.push(OneSignal => resolve(OneSignal));
+  });
+}
+
+/*************************************************
+ * ENSURE PUSH IS ENABLED
  *************************************************/
 async function ensurePushEnabled() {
+  console.log("ensurePushEnabled()");
+
   if (isFacebookBrowser || isInstagramBrowser) {
-    if (isIOS) {
-      showToast(`
-        ⚠️ iOS does not allow notifications inside Facebook.<br>
-        Open in Safari → Add to Home Screen.
-      `);
-    } else {
-      showToast(`
-        ⚠️ FB / Instagram browser does not support notifications.<br>
-        Open in Chrome.
-      `);
-    }
+    showToast(
+      isIOS
+        ? "⚠️ Open in Safari → Add to Home Screen"
+        : "⚠️ Open in Chrome (in-app browser unsupported)"
+    );
     return false;
   }
 
   if (isIOS && !isPWA) {
-    showToast(`
-      📱 iOS requires Add to Home Screen.<br>
-      Share → Add to Home Screen.
-    `);
+    showToast("📱 Add to Home Screen required for iOS alerts");
     return false;
   }
 
+  const OneSignal = await waitForOneSignal();
+  if (!OneSignal) return false;
+
   try {
     const permission = await OneSignal.Notifications.requestPermission();
+    console.log("Permission:", permission);
+
     if (!permission) {
-      showToast("🔕 Notifications are blocked in browser settings.");
+      showToast("🔕 Notifications blocked in browser");
       return false;
     }
 
@@ -100,47 +109,46 @@ async function ensurePushEnabled() {
     return OneSignal.User.PushSubscription.optedIn === true;
   } catch (e) {
     console.error(e);
-    showToast("❌ Failed to enable alerts.");
+    showToast("❌ Failed to enable alerts");
     return false;
   }
 }
 
 /*************************************************
- * TOGGLE CHOKEPOINT SUBSCRIPTION
+ * TOGGLE SUBSCRIPTION (FIXED)
  *************************************************/
 async function toggleChokepointSubscription(chokepointId) {
   console.log("Clicked chokepoint:", chokepointId);
+
   const subs = getSubscriptions();
   const alreadySubscribed = subs.includes(chokepointId);
 
   const enabled = await ensurePushEnabled();
   if (!enabled) return;
 
-  window.OneSignalDeferred.push(async function (OneSignal) {
-    try {
-      if (alreadySubscribed) {
-        // UNSUBSCRIBE
-        await OneSignal.User.addTag(`cp_${chokepointId}`, "0");
-        saveSubscriptions(subs.filter(id => id !== chokepointId));
-        showToast("🔕 Alerts disabled for this road");
-      } else {
-        // SUBSCRIBE
-        await OneSignal.User.addTag(`cp_${chokepointId}`, "1");
-        subs.push(chokepointId);
-        saveSubscriptions(subs);
-        showToast("🔔 Alerts enabled for this road");
-      }
+  const OneSignal = await waitForOneSignal();
+  if (!OneSignal) return;
 
-      renderUI(window.__AREAS__);
-    } catch (e) {
-      console.error(e);
-      showToast("⚠️ Failed to update subscription");
+  try {
+    if (alreadySubscribed) {
+      await OneSignal.User.addTag(`cp_${chokepointId}`, "0");
+      saveSubscriptions(subs.filter(id => id !== chokepointId));
+      showToast("🔕 Alerts disabled");
+    } else {
+      await OneSignal.User.addTag(`cp_${chokepointId}`, "1");
+      saveSubscriptions([...subs, chokepointId]);
+      showToast("🔔 Alerts enabled");
     }
-  });
+
+    renderUI(window.__AREAS__);
+  } catch (e) {
+    console.error("Subscription error", e);
+    showToast("⚠️ Failed to update alerts");
+  }
 }
 
 /*************************************************
- * LOAD CHOKEPOINTS FROM API
+ * LOAD CHOKEPOINTS
  *************************************************/
 async function loadChokepoints() {
   const res = await fetch(API_URL);
