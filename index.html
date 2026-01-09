@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pune Traffic – Choke Point Alerts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+
+    header {
+      padding: 16px;
+      background: #020617;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .container {
+      padding: 16px;
+    }
+
+    .area {
+      margin-bottom: 24px;
+    }
+
+    .area h2 {
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: #93c5fd;
+    }
+
+    .chokepoint {
+      background: #020617;
+      padding: 12px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      border: 1px solid #1e293b;
+    }
+
+    .chokepoint:hover {
+      background: #020617;
+      border-color: #38bdf8;
+    }
+
+    .subscribed {
+      border-color: #22c55e;
+    }
+
+    .badge {
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #1e293b;
+    }
+
+    .badge.sub {
+      background: #14532d;
+      color: #86efac;
+    }
+
+    footer {
+      padding: 12px;
+      font-size: 12px;
+      color: #94a3b8;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    Pune Traffic Alerts
+  </header>
+
+  <div class="container" id="app">
+    Loading choke points…
+  </div>
+
+  <footer>
+    Subscriptions are saved on this device
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
