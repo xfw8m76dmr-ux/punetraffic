@@ -61,16 +61,14 @@ function showToast(message) {
 }
 
 /*************************************************
- * 🔑 ONESIGNAL READY PROMISE (CRITICAL FIX)
+ * 🔑 ONESIGNAL INIT + READY PROMISE (CORRECT)
  *************************************************/
 let oneSignalResolve;
 const oneSignalReady = new Promise(resolve => {
   oneSignalResolve = resolve;
 });
 
-// Ensure global exists before SDK loads
 window.OneSignalDeferred = window.OneSignalDeferred || [];
-
 window.OneSignalDeferred.push(async function (OneSignal) {
   try {
     console.log("🟡 OneSignal init starting");
@@ -83,74 +81,57 @@ window.OneSignalDeferred.push(async function (OneSignal) {
     });
 
     console.log("✅ OneSignal init completed");
-
-    // 🔥 THIS WAS MISSING
     oneSignalResolve(OneSignal);
-
   } catch (e) {
     console.error("❌ OneSignal init failed", e);
   }
 });
 
-
 /*************************************************
- * ENSURE PUSH IS ENABLED
+ * 🔔 CLICK HANDLER (THIS IS THE KEY FIX)
  *************************************************/
-async function ensurePushEnabledFromClick() {
-  console.log("ensurePushEnabledFromClick()");
+async function toggleChokepointSubscription(chokepointId) {
+  console.log("Clicked chokepoint:", chokepointId);
 
-  // Hard blocks
+  /* -------- HARD BLOCKS -------- */
   if (isFacebookBrowser || isInstagramBrowser) {
     showToast(
       isIOS
         ? "⚠️ Open in Safari → Add to Home Screen"
         : "⚠️ Open in Chrome (in-app browser unsupported)"
     );
-    return false;
+    return;
   }
 
   if (isIOS && !isPWA) {
     showToast("📱 Add to Home Screen required for iOS alerts");
-    return false;
-  }
-
-  // 🚨 CRITICAL: permission MUST be requested synchronously
-  try {
-    const permission = await OneSignal.Notifications.requestPermission();
-    console.log("Permission result:", permission);
-
-    if (!permission) {
-      showToast("🔕 Notifications blocked in browser");
-      return false;
-    }
-
-    return true;
-  } catch (e) {
-    console.error("Permission request failed", e);
-    showToast("❌ Failed to request permission");
-    return false;
-  }
-}
-
-
-/*************************************************
- * TOGGLE CHOKEPOINT SUBSCRIPTION
- *************************************************/
-async function toggleChokepointSubscription(chokepointId) {
-  console.log("Clicked chokepoint:", chokepointId);
-
-  // 1️⃣ Permission — MUST happen immediately
-  const permissionOk = await ensurePushEnabledFromClick();
-  if (!permissionOk) {
-    console.log("Permission not granted, aborting");
     return;
   }
 
-  // 2️⃣ Now we can safely await OneSignal init
+  /* ------------------------------------------------
+   * 🚨 CRITICAL: PERMISSION REQUEST
+   * MUST happen immediately, synchronously
+   * ------------------------------------------------ */
+  let permission;
+  try {
+    permission = await OneSignal.Notifications.requestPermission();
+    console.log("Permission result:", permission);
+  } catch (e) {
+    console.error("Permission request failed", e);
+    showToast("❌ Failed to request permission");
+    return;
+  }
+
+  if (!permission) {
+    showToast("🔕 Notifications blocked in browser");
+    return;
+  }
+
+  /* -------- WAIT FOR INIT (NOW SAFE) -------- */
   const OneSignalInstance = await oneSignalReady;
   console.log("OneSignal fully ready");
 
-  // 3️⃣ Ensure push subscription
+  /* -------- ENSURE PUSH SUB -------- */
   await OneSignalInstance.User.PushSubscription.optIn();
 
   const subs = getSubscriptions();
@@ -173,7 +154,6 @@ async function toggleChokepointSubscription(chokepointId) {
     showToast("⚠️ Failed to update alerts");
   }
 }
-
 
 /*************************************************
  * LOAD CHOKEPOINTS
