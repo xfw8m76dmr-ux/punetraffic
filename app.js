@@ -61,17 +61,19 @@ function showToast(message) {
 }
 
 /*************************************************
- * WAIT FOR ONESIGNAL (CRITICAL FIX)
+ * 🔑 ONESIGNAL READY PROMISE (CRITICAL FIX)
  *************************************************/
-function waitForOneSignal() {
-  return new Promise(resolve => {
-    if (!window.OneSignalDeferred) {
-      console.error("❌ OneSignalDeferred missing");
-      return resolve(null);
-    }
-    window.OneSignalDeferred.push(OneSignal => resolve(OneSignal));
-  });
-}
+let oneSignalResolve;
+const oneSignalReady = new Promise(resolve => {
+  oneSignalResolve = resolve;
+});
+
+// Attach to OneSignal init
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+window.OneSignalDeferred.push(async function (OneSignal) {
+  console.log("✅ OneSignal initialized");
+  oneSignalResolve(OneSignal);
+});
 
 /*************************************************
  * ENSURE PUSH IS ENABLED
@@ -79,6 +81,7 @@ function waitForOneSignal() {
 async function ensurePushEnabled() {
   console.log("ensurePushEnabled()");
 
+  // Block unsupported environments
   if (isFacebookBrowser || isInstagramBrowser) {
     showToast(
       isIOS
@@ -93,8 +96,9 @@ async function ensurePushEnabled() {
     return false;
   }
 
-  const OneSignal = await waitForOneSignal();
-  if (!OneSignal) return false;
+  // ⏳ WAIT for OneSignal.init to complete
+  const OneSignal = await oneSignalReady;
+  console.log("OneSignal ready for permission");
 
   try {
     const permission = await OneSignal.Notifications.requestPermission();
@@ -106,16 +110,18 @@ async function ensurePushEnabled() {
     }
 
     await OneSignal.User.PushSubscription.optIn();
+    console.log("Opted in:", OneSignal.User.PushSubscription.optedIn);
+
     return OneSignal.User.PushSubscription.optedIn === true;
   } catch (e) {
-    console.error(e);
+    console.error("ensurePushEnabled error", e);
     showToast("❌ Failed to enable alerts");
     return false;
   }
 }
 
 /*************************************************
- * TOGGLE SUBSCRIPTION (FIXED)
+ * TOGGLE CHOKEPOINT SUBSCRIPTION
  *************************************************/
 async function toggleChokepointSubscription(chokepointId) {
   console.log("Clicked chokepoint:", chokepointId);
@@ -124,10 +130,12 @@ async function toggleChokepointSubscription(chokepointId) {
   const alreadySubscribed = subs.includes(chokepointId);
 
   const enabled = await ensurePushEnabled();
-  if (!enabled) return;
+  if (!enabled) {
+    console.log("Push not enabled, aborting");
+    return;
+  }
 
-  const OneSignal = await waitForOneSignal();
-  if (!OneSignal) return;
+  const OneSignal = await oneSignalReady;
 
   try {
     if (alreadySubscribed) {
