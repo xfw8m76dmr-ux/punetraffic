@@ -63,17 +63,20 @@ function showToast(message) {
 /*************************************************
  * 🔑 ONESIGNAL READY PROMISE (CRITICAL FIX)
  *************************************************/
-let oneSignalResolve;
-const oneSignalReady = new Promise(resolve => {
-  oneSignalResolve = resolve;
-});
+// let oneSignalResolve;
+// const oneSignalReady = new Promise(resolve => {
+//   oneSignalResolve = resolve;
+// });
 
 // Attach to OneSignal init
 window.OneSignalDeferred = window.OneSignalDeferred || [];
-window.OneSignalDeferred.push(async function (OneSignal) {
-  console.log("✅ OneSignal initialized");
-  oneSignalResolve(OneSignal);
+
+window.OneSignalDeferred.push(async function(OneSignal) {
+  await OneSignal.init({
+    appId: "a0be9561-f1b6-4f22-a214-e8b6412f28b3",
+  });
 });
+
 
 /*************************************************
  * ENSURE PUSH IS ENABLED
