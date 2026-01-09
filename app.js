@@ -63,18 +63,33 @@ function showToast(message) {
 /*************************************************
  * 🔑 ONESIGNAL READY PROMISE (CRITICAL FIX)
  *************************************************/
-// let oneSignalResolve;
-// const oneSignalReady = new Promise(resolve => {
-//   oneSignalResolve = resolve;
-// });
+let oneSignalResolve;
+const oneSignalReady = new Promise(resolve => {
+  oneSignalResolve = resolve;
+});
 
-// Attach to OneSignal init
+// Ensure global exists before SDK loads
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 
-window.OneSignalDeferred.push(async function(OneSignal) {
-  await OneSignal.init({
-    appId: "a0be9561-f1b6-4f22-a214-e8b6412f28b3",
-  });
+window.OneSignalDeferred.push(async function (OneSignal) {
+  try {
+    console.log("🟡 OneSignal init starting");
+
+    await OneSignal.init({
+      appId: "a0be9561-f1b6-4f22-a214-e8b6412f28b3",
+      serviceWorkerPath: "OneSignalSDKWorker.js",
+      serviceWorkerParam: { scope: "/" },
+      notifyButton: { enable: false }
+    });
+
+    console.log("✅ OneSignal init completed");
+
+    // 🔥 THIS WAS MISSING
+    oneSignalResolve(OneSignal);
+
+  } catch (e) {
+    console.error("❌ OneSignal init failed", e);
+  }
 });
 
 
