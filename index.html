@@ -9,107 +9,136 @@
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
   <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont;
-      background: #f5f7fa;
-      color: #222;
-    }
+   body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  background: #f5f7fa;
+  color: #111;
+}
 
-    header {
-      background: #111827;
-      color: white;
-      padding: 14px;
-      text-align: center;
-    }
+header {
+  background: #111827;
+  color: white;
+  padding: 14px;
+  text-align: center;
+}
 
-    main {
-      max-width: 900px;
-      margin: auto;
-      padding: 16px;
-    }
+main {
+  max-width: 900px;
+  margin: auto;
+  padding: 16px;
+}
 
-    .controls {
-      text-align: center;
-      margin-bottom: 16px;
-    }
+/* ---------- Segmented Control ---------- */
 
-    .toggle-view {
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-    }
+.controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
-    }
+.segmented {
+  display: inline-flex;
+  background: #e5e7eb;
+  border-radius: 10px;
+  padding: 4px;
+}
 
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 14px;
-      box-shadow: 0 6px 16px rgba(0,0,0,.06);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+.seg {
+  border: none;
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #374151;
+}
 
-    .card h3 {
-      margin: 0;
-      font-size: 1.05rem;
-    }
+.seg.active {
+  background: #2563eb;
+  color: white;
+}
 
-    .area {
-      font-size: .85rem;
-      color: #666;
-    }
+/* ---------- Grid ---------- */
 
-    .status {
-      font-size: .8rem;
-      font-weight: 600;
-    }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
 
-    .LOW { color: #16a34a; }
-    .MODERATE { color: #d97706; }
-    .HIGH { color: #dc2626; }
+/* ---------- Card ---------- */
 
-    .subscribe-btn {
-      margin-top: auto;
-      padding: 8px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-size: 13px;
-    }
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-left: 4px solid transparent;
+}
 
-    .subscribed {
-      background: #dc2626;
-      color: white;
-    }
+/* Traffic borders */
+.card.LOW { border-left-color: #16a34a; }
+.card.MODERATE { border-left-color: #d97706; }
+.card.HIGH { border-left-color: #dc2626; }
 
-    .not-subscribed {
-      background: #16a34a;
-      color: white;
-    }
+.card h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
 
-    footer {
-      text-align: center;
-      padding: 16px;
-      font-size: 12px;
-      color: #777;
-    }
+.area {
+  font-size: .8rem;
+  color: #6b7280;
+}
 
-    .checked-at {
-      margin-top: 6px;
-      font-size: 12px;
-      color: #9aa0a6;
-    }
+/* ---------- Status ---------- */
+
+.status-row {
+  font-size: .8rem;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.status-row.LOW { color: #16a34a; }
+.status-row.MODERATE { color: #d97706; }
+.status-row.HIGH { color: #dc2626; }
+
+/* ---------- Button ---------- */
+
+.subscribe-btn {
+  margin-top: auto;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+}
+
+.not-subscribed {
+  background: #16a34a;
+  color: white;
+}
+
+.subscribed {
+  background: white;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+}
+
+/* ---------- Footer ---------- */
+
+footer {
+  text-align: center;
+  padding: 12px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
   </style>
 </head>
 
