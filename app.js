@@ -245,7 +245,7 @@ function render() {
       item.innerHTML = `
         <div class="cp-name">${cp.name}</div>
         <div class="cp-status">${cp.traffic.label}</div>
-        <div class="cp-time">Updated: ${lastChecked}</div>
+        <div class="cp-time">Last checked: ${lastChecked}</div>
         <a href="${mapUrl}" target="_blank" class="map-link">
           📍
         </a>
