@@ -198,7 +198,21 @@ function render() {
 
   const grouped = groupByArea(ALL_CHOKEPOINTS);
 
-  Object.entries(grouped).forEach(([areaKey, area]) => {
+  const sortedAreas = Object.entries(grouped).sort(
+    ([keyA], [keyB]) => {
+      const aSub = subs.includes(keyA);
+      const bSub = subs.includes(keyB);
+
+      // Subscribed areas first
+      if (aSub && !bSub) return -1;
+      if (!aSub && bSub) return 1;
+
+      // Stable fallback (alphabetical)
+      return keyA.localeCompare(keyB);
+    }
+  );
+
+  sortedAreas.forEach(([areaKey, area]) => {
     const isSub = subs.includes(areaKey);
     if (SHOW_ONLY_SUBSCRIBED && !isSub) return;
 
@@ -212,7 +226,6 @@ function render() {
           ${isSub ? "Unsubscribe" : "Subscribe"}
         </button>
       </div>
-
       <div class="chokepoint-list"></div>
     `;
 
@@ -244,14 +257,24 @@ function render() {
     grid.appendChild(areaCard);
   });
 
+  // Empty state
   if (!grid.children.length) {
     grid.innerHTML = `
       <p class="no_chokepoints">
-        Subscribe to up to 2 areas to receive live traffic alerts.
+        Subscribe to up to ${MAX_AREA_SUBSCRIPTIONS} areas to receive live traffic alerts.
       </p>
     `;
   }
+
+  // ⬆️ Auto-scroll when user has subscriptions
+  if (subs.length > 0) {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
 }
+
 
 /*************************************************
  * LOAD
