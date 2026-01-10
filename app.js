@@ -186,7 +186,7 @@ function render() {
     const isSub = subs.includes(cp.id);
     const lastChecked = formatCheckedAt(cp.traffic?.checkedAt);
     const mapUrl = getGoogleMapsUrl(cp.lat, cp.lng, cp.name);
-
+    // • Delay ${Math.max(0, cp.traffic.delayMin)} min per 250m
     card.innerHTML = `
       <h3>${cp.name}</h3>
       <div class="area">${cp.area}</div>
@@ -194,7 +194,6 @@ function render() {
       <div class="status-row ${cp.traffic.status}">
         ${cp.traffic.label} 
       </div>
-      // • Delay ${Math.max(0, cp.traffic.delayMin)} min   // not showing delay is it is for 200m around chokepoint and could confuse users
 
       <div class="checked-at">
         Last updated: ${lastChecked}
