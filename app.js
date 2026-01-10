@@ -1,11 +1,17 @@
 /*************************************************
  * CONFIG
  *************************************************/
-const API_URL = "https://chokepointsmaster.k7jzqg8c4k.workers.dev/api/chokepoints";
+const API_URL = "https://punetrafficcron.k7jzqg8c4k.workers.dev/api/chokepoints";
 const STORAGE_KEY = "subscribed_chokepoints";
 
 /*************************************************
- * BASIC HELPERS
+ * STATE
+ *************************************************/
+let ALL_CHOKEPOINTS = [];
+let SHOW_ONLY_SUBSCRIBED = false;
+
+/*************************************************
+ * STORAGE HELPERS
  *************************************************/
 function getSubscriptions() {
   try {
@@ -20,205 +26,158 @@ function saveSubscriptions(list) {
 }
 
 /*************************************************
- * USER AGENT / ENV CHECKS
+ * ENV CHECKS (FROM YOUR FILE)
  *************************************************/
 const ua = navigator.userAgent.toLowerCase();
 const isIOS = /iphone|ipad|ipod/.test(ua);
 const isPWA =
   window.matchMedia("(display-mode: standalone)").matches ||
   navigator.standalone === true;
-const isFacebookBrowser =
-  navigator.userAgent.includes("FBAN") ||
-  navigator.userAgent.includes("FBAV");
-const isInstagramBrowser = navigator.userAgent.includes("Instagram");
+const isFacebookBrowser = ua.includes("fban") || ua.includes("fbav");
+const isInstagramBrowser = ua.includes("instagram");
 
 /*************************************************
  * TOAST
  *************************************************/
 function showToast(message) {
   const t = document.createElement("div");
-  t.innerHTML = message;
+  t.textContent = message;
   t.style = `
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #222;
+    background: #111;
     color: #fff;
     padding: 12px 18px;
     border-radius: 8px;
     font-size: 14px;
-    opacity: 0;
-    transition: opacity .4s;
     z-index: 99999;
   `;
   document.body.appendChild(t);
-  requestAnimationFrame(() => (t.style.opacity = 1));
-  setTimeout(() => {
-    t.style.opacity = 0;
-    setTimeout(() => t.remove(), 400);
-  }, 5000);
+  setTimeout(() => t.remove(), 3500);
 }
 
 /*************************************************
- * 🔑 ONESIGNAL INIT + READY PROMISE (CORRECT)
+ * 🔑 ONESIGNAL INIT
  *************************************************/
 let oneSignalResolve;
-const oneSignalReady = new Promise(resolve => {
-  oneSignalResolve = resolve;
-});
+const oneSignalReady = new Promise(r => (oneSignalResolve = r));
 
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 window.OneSignalDeferred.push(async function (OneSignal) {
-  try {
-    console.log("🟡 OneSignal init starting");
-
-    await OneSignal.init({
-      appId: "a0be9561-f1b6-4f22-a214-e8b6412f28b3",
-      serviceWorkerPath: "OneSignalSDKWorker.js",
-      serviceWorkerParam: { scope: "/" },
-      notifyButton: { enable: false }
-    });
-
-    console.log("✅ OneSignal init completed");
-    oneSignalResolve(OneSignal);
-  } catch (e) {
-    console.error("❌ OneSignal init failed", e);
-  }
+  await OneSignal.init({
+    appId: "a0be9561-f1b6-4f22-a214-e8b6412f28b3",
+    notifyButton: { enable: false }
+  });
+  oneSignalResolve(OneSignal);
 });
 
 /*************************************************
- * 🔔 CLICK HANDLER (THIS IS THE KEY FIX)
+ * 🔔 SUBSCRIBE / UNSUBSCRIBE
  *************************************************/
-async function toggleChokepointSubscription(chokepointId) {
-  console.log("Clicked chokepoint:", chokepointId);
-
-  /* -------- HARD BLOCKS -------- */
+async function toggleSubscription(id) {
   if (isFacebookBrowser || isInstagramBrowser) {
-    showToast(
-      isIOS
-        ? "⚠️ Open in Safari → Add to Home Screen"
-        : "⚠️ Open in Chrome (in-app browser unsupported)"
-    );
+    showToast("⚠️ Open in Chrome or Safari");
     return;
   }
 
   if (isIOS && !isPWA) {
-    showToast("📱 Add to Home Screen required for iOS alerts");
+    showToast("📱 Add to Home Screen required");
     return;
   }
 
-  /* ------------------------------------------------
-   * 🚨 CRITICAL: PERMISSION REQUEST
-   * MUST happen immediately, synchronously
-   * ------------------------------------------------ */
-  let permission;
-  try {
-    permission = await OneSignal.Notifications.requestPermission();
-    console.log("Permission result:", permission);
-  } catch (e) {
-    console.error("Permission request failed", e);
-    showToast("❌ Failed to request permission");
-    return;
-  }
-
+  const permission = await OneSignal.Notifications.requestPermission();
   if (!permission) {
-    showToast("🔕 Notifications blocked in browser");
+    showToast("🔕 Notifications blocked");
     return;
   }
 
-  /* -------- WAIT FOR INIT (NOW SAFE) -------- */
-  const OneSignalInstance = await oneSignalReady;
-  console.log("OneSignal fully ready");
-
-  /* -------- ENSURE PUSH SUB -------- */
-  await OneSignalInstance.User.PushSubscription.optIn();
+  const OneSignal = await oneSignalReady;
+  await OneSignal.User.PushSubscription.optIn();
 
   const subs = getSubscriptions();
-  const alreadySubscribed = subs.includes(chokepointId);
+  const isSub = subs.includes(id);
 
   try {
-    if (alreadySubscribed) {
-      await OneSignalInstance.User.addTag(`cp_${chokepointId}`, "0");
-      saveSubscriptions(subs.filter(id => id !== chokepointId));
+    if (isSub) {
+      await OneSignal.User.addTag(`cp_${id}`, "0");
+      saveSubscriptions(subs.filter(x => x !== id));
       showToast("🔕 Alerts disabled");
     } else {
-      await OneSignalInstance.User.addTag(`cp_${chokepointId}`, "1");
-      saveSubscriptions([...subs, chokepointId]);
+      await OneSignal.User.addTag(`cp_${id}`, "1");
+      saveSubscriptions([...subs, id]);
       showToast("🔔 Alerts enabled");
     }
-
-    renderUI(window.__AREAS__);
-  } catch (e) {
-    console.error("Subscription error", e);
+    render();
+  } catch {
     showToast("⚠️ Failed to update alerts");
   }
 }
 
 /*************************************************
- * LOAD CHOKEPOINTS
- *************************************************/
-async function loadChokepoints() {
-  const res = await fetch(API_URL);
-  if (!res.ok) throw new Error("Failed to load chokepoints");
-  return res.json();
-}
-
-/*************************************************
  * RENDER UI
  *************************************************/
-function renderUI(areas) {
-  const container = document.getElementById("app");
+function render() {
+  const grid = document.getElementById("grid");
   const subs = getSubscriptions();
-  container.innerHTML = "";
+  grid.innerHTML = "";
 
-  Object.keys(areas).forEach(areaName => {
-    const areaDiv = document.createElement("div");
-    areaDiv.className = "area";
+  const list = SHOW_ONLY_SUBSCRIBED
+    ? ALL_CHOKEPOINTS.filter(cp => subs.includes(cp.id))
+    : ALL_CHOKEPOINTS;
 
-    const title = document.createElement("h2");
-    title.textContent = areaName;
-    areaDiv.appendChild(title);
+  if (list.length === 0) {
+    grid.innerHTML = "<p>No chokepoints subscribed.</p>";
+    return;
+  }
 
-    areas[areaName].forEach(cp => {
-      const item = document.createElement("div");
-      item.className = "chokepoint";
+  list.forEach(cp => {
+    const card = document.createElement("div");
+    card.className = "card";
 
-      const isSub = subs.includes(cp.id);
-      if (isSub) item.classList.add("subscribed");
+    const isSub = subs.includes(cp.id);
 
-      const name = document.createElement("div");
-      name.textContent = cp.name;
+    card.innerHTML = `
+      <h3>${cp.name}</h3>
+      <div class="area">${cp.area}</div>
+      <div class="status ${cp.traffic.status}">
+        ${cp.traffic.label} • Delay ${Math.max(0, cp.traffic.delayMin)} min
+      </div>
+      <button class="subscribe-btn ${isSub ? "subscribed" : "not-subscribed"}">
+        ${isSub ? "Unsubscribe" : "Subscribe"}
+      </button>
+    `;
 
-      const badge = document.createElement("div");
-      badge.className = "badge";
-      badge.textContent = isSub ? "Subscribed" : "Subscribe";
-      if (isSub) badge.classList.add("sub");
+    card.querySelector("button").onclick = () =>
+      toggleSubscription(cp.id);
 
-      item.appendChild(name);
-      item.appendChild(badge);
-
-      item.onclick = () => toggleChokepointSubscription(cp.id);
-
-      areaDiv.appendChild(item);
-    });
-
-    container.appendChild(areaDiv);
+    grid.appendChild(card);
   });
 }
 
 /*************************************************
+ * LOAD DATA
+ *************************************************/
+async function load() {
+  const res = await fetch(API_URL);
+  ALL_CHOKEPOINTS = await res.json();
+  render();
+}
+
+/*************************************************
+ * TOGGLE VIEW BUTTON
+ *************************************************/
+document.getElementById("toggleViewBtn").onclick = () => {
+  SHOW_ONLY_SUBSCRIBED = !SHOW_ONLY_SUBSCRIBED;
+  document.getElementById("toggleViewBtn").textContent =
+    SHOW_ONLY_SUBSCRIBED
+      ? "View All Chokepoints"
+      : "Show My List";
+  render();
+};
+
+/*************************************************
  * INIT
  *************************************************/
-(async function init() {
-  const app = document.getElementById("app");
-  try {
-    const data = await loadChokepoints();
-    window.__AREAS__ = data.areas;
-    renderUI(data.areas);
-  } catch (e) {
-    console.error(e);
-    app.textContent =
-      "❌ Failed to load choke points. Please try again later.";
-  }
-})();
+load();
