@@ -76,41 +76,67 @@ window.OneSignalDeferred.push(async function (OneSignal) {
 /*************************************************
  * 🔔 SUBSCRIBE / UNSUBSCRIBE
  *************************************************/
-async function toggleSubscription(id) {
+async function toggleSubscription(chokepointId) {
+  /* -------- HARD BLOCKS -------- */
   if (isFacebookBrowser || isInstagramBrowser) {
-    showToast("⚠️ Open in Chrome or Safari");
+    showToast(
+      isIOS
+        ? "⚠️ Open in Safari → Add to Home Screen"
+        : "⚠️ Open in Chrome (in-app browser unsupported)"
+    );
     return;
   }
 
   if (isIOS && !isPWA) {
-    showToast("📱 Add to Home Screen required");
+    showToast("📱 Add to Home Screen required for iOS alerts");
     return;
   }
 
-  const permission = await OneSignal.Notifications.requestPermission();
+  /* -------- WAIT FOR ONESIGNAL -------- */
+  const OneSignalInstance = await oneSignalReady;
+
+  /* -------- REQUEST PERMISSION (SAFE) -------- */
+  let permission;
+  try {
+    permission =
+      await OneSignalInstance.Notifications.requestPermission();
+  } catch (e) {
+    console.error("Permission request failed", e);
+    showToast("❌ Failed to request permission");
+    return;
+  }
+
   if (!permission) {
     showToast("🔕 Notifications blocked");
     return;
   }
 
-  const OneSignal = await oneSignalReady;
-  await OneSignal.User.PushSubscription.optIn();
+  /* -------- ENSURE PUSH SUB -------- */
+  await OneSignalInstance.User.PushSubscription.optIn();
 
   const subs = getSubscriptions();
-  const isSub = subs.includes(id);
+  const alreadySubscribed = subs.includes(chokepointId);
 
   try {
-    if (isSub) {
-      await OneSignal.User.addTag(`cp_${id}`, "0");
-      saveSubscriptions(subs.filter(x => x !== id));
+    if (alreadySubscribed) {
+      await OneSignalInstance.User.addTag(
+        `cp_${chokepointId}`,
+        "0"
+      );
+      saveSubscriptions(subs.filter(id => id !== chokepointId));
       showToast("🔕 Alerts disabled");
     } else {
-      await OneSignal.User.addTag(`cp_${id}`, "1");
-      saveSubscriptions([...subs, id]);
+      await OneSignalInstance.User.addTag(
+        `cp_${chokepointId}`,
+        "1"
+      );
+      saveSubscriptions([...subs, chokepointId]);
       showToast("🔔 Alerts enabled");
     }
+
     render();
-  } catch {
+  } catch (e) {
+    console.error("Subscription error", e);
     showToast("⚠️ Failed to update alerts");
   }
 }
