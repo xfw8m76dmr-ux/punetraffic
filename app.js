@@ -3,7 +3,7 @@
  *************************************************/
 const API_URL =
   "https://punetrafficcron.k7jzqg8c4k.workers.dev/api/chokepoints";
-const STORAGE_KEY = "subscribed_chokepoints";
+const STORAGE_KEY = "subscribed_areas";
 
 /*************************************************
  * STATE
@@ -56,14 +56,14 @@ function showToast(message) {
     z-index: 99999;
   `;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3500);
+  setTimeout(() => t.remove(), 3000);
 }
 
 /*************************************************
  * GOOGLE MAPS
  *************************************************/
 function getGoogleMapsUrl(lat, lng, name) {
-  const label = encodeURIComponent(name || "Chokepoint");
+  const label = encodeURIComponent(name);
   return `https://www.google.com/maps?q=${lat},${lng}(${label})`;
 }
 
@@ -83,9 +83,9 @@ window.OneSignalDeferred.push(async function (OneSignal) {
 });
 
 /*************************************************
- * SUBSCRIBE / UNSUBSCRIBE
+ * AREA SUBSCRIBE / UNSUBSCRIBE
  *************************************************/
-async function toggleSubscription(chokepointId) {
+async function toggleAreaSubscription(areaKey) {
   if (isFacebookBrowser || isInstagramBrowser) {
     showToast(
       isIOS
@@ -102,14 +102,7 @@ async function toggleSubscription(chokepointId) {
 
   const OneSignal = await oneSignalReady;
 
-  let permission;
-  try {
-    permission = await OneSignal.Notifications.requestPermission();
-  } catch {
-    showToast("❌ Permission request failed");
-    return;
-  }
-
+  const permission = await OneSignal.Notifications.requestPermission();
   if (!permission) {
     showToast("🔕 Notifications blocked");
     return;
@@ -118,25 +111,21 @@ async function toggleSubscription(chokepointId) {
   await OneSignal.User.PushSubscription.optIn();
 
   const subs = getSubscriptions();
-  const isSub = subs.includes(chokepointId);
+  const isSub = subs.includes(areaKey);
 
-  try {
-    await OneSignal.User.addTag(
-      `cp_${chokepointId}`,
-      isSub ? "0" : "1"
-    );
+  await OneSignal.User.addTag(
+    `area_${areaKey}`,
+    isSub ? "0" : "1"
+  );
 
-    saveSubscriptions(
-      isSub
-        ? subs.filter(id => id !== chokepointId)
-        : [...subs, chokepointId]
-    );
+  saveSubscriptions(
+    isSub
+      ? subs.filter(a => a !== areaKey)
+      : [...subs, areaKey]
+  );
 
-    showToast(isSub ? "🔕 Alerts disabled" : "🔔 Alerts enabled");
-    render();
-  } catch {
-    showToast("⚠️ Failed to update alerts");
-  }
+  showToast(isSub ? "🔕 Area alerts disabled" : "🔔 Area alerts enabled");
+  render();
 }
 
 /*************************************************
@@ -163,6 +152,18 @@ function formatCheckedAt(checkedAt) {
 }
 
 /*************************************************
+ * GROUP BY AREA
+ *************************************************/
+function groupByArea(list) {
+  return list.reduce((acc, cp) => {
+    const key = cp.area.toLowerCase().replace(/\s+/g, "_");
+    acc[key] = acc[key] || { name: cp.area, items: [] };
+    acc[key].items.push(cp);
+    return acc;
+  }, {});
+}
+
+/*************************************************
  * RENDER
  *************************************************/
 function render() {
@@ -170,53 +171,55 @@ function render() {
   const subs = getSubscriptions();
   grid.innerHTML = "";
 
-  const list = SHOW_ONLY_SUBSCRIBED
-    ? ALL_CHOKEPOINTS.filter(cp => subs.includes(cp.id))
-    : ALL_CHOKEPOINTS;
+  const grouped = groupByArea(ALL_CHOKEPOINTS);
 
-  if (list.length === 0) {
-    grid.innerHTML = `<p class="no_chokepoints">Add Chokepoints to receive Congestion Alerts. No Spam.</p>`;
-    return;
-  }
+  Object.entries(grouped).forEach(([areaKey, area]) => {
+    const isSub = subs.includes(areaKey);
+    if (SHOW_ONLY_SUBSCRIBED && !isSub) return;
 
-  list.forEach(cp => {
-    const card = document.createElement("div");
-    card.className = `card ${cp.traffic.status}`;
+    const areaCard = document.createElement("div");
+    areaCard.className = "area-card";
 
-    const isSub = subs.includes(cp.id);
-    const lastChecked = formatCheckedAt(cp.traffic?.checkedAt);
-    const mapUrl = getGoogleMapsUrl(cp.lat, cp.lng, cp.name);
-    // • Delay ${Math.max(0, cp.traffic.delayMin)} min per 250m
-    card.innerHTML = `
-      <h3>${cp.name}</h3>
-      <div class="area">${cp.area}</div>
-
-      <div class="status-row ${cp.traffic.status}">
-        ${cp.traffic.label} 
-      </div>
-
-      <div class="checked-at">
-        Last updated: ${lastChecked}
-      </div>
-
-      <div class="card-actions">
-        <a href="${mapUrl}" target="_blank" rel="noopener" class="map-link">
-          📍 Open in Google Maps
-        </a>
-
-        <button class="subscribe-btn ${
-          isSub ? "subscribed" : "not-subscribed"
-        }">
+    areaCard.innerHTML = `
+      <div class="area-header">
+        <h2>${area.name}</h2>
+        <button class="subscribe-btn ${isSub ? "subscribed" : ""}">
           ${isSub ? "Unsubscribe" : "Subscribe"}
         </button>
       </div>
+      <div class="chokepoint-list"></div>
     `;
 
-    card.querySelector("button").onclick = () =>
-      toggleSubscription(cp.id);
+    areaCard
+      .querySelector("button")
+      .onclick = () => toggleAreaSubscription(areaKey);
 
-    grid.appendChild(card);
+    const list = areaCard.querySelector(".chokepoint-list");
+
+    area.items.forEach(cp => {
+      const mapUrl = getGoogleMapsUrl(cp.lat, cp.lng, cp.name);
+      const lastChecked = formatCheckedAt(cp.traffic?.checkedAt);
+
+      const item = document.createElement("div");
+      item.className = `chokepoint ${cp.traffic.status}`;
+
+      item.innerHTML = `
+        <div class="cp-name">${cp.name}</div>
+        <div class="cp-status">${cp.traffic.label}</div>
+        <div class="cp-time">Updated: ${lastChecked}</div>
+        <a href="${mapUrl}" target="_blank" class="map-link">📍 Map</a>
+      `;
+
+      list.appendChild(item);
+    });
+
+    grid.appendChild(areaCard);
   });
+
+  if (!grid.children.length) {
+    grid.innerHTML =
+      `<p class="no_chokepoints">Subscribe to an area to receive traffic alerts.</p>`;
+  }
 }
 
 /*************************************************
@@ -234,7 +237,7 @@ async function load() {
 document.getElementById("toggleViewBtn").onclick = () => {
   SHOW_ONLY_SUBSCRIBED = !SHOW_ONLY_SUBSCRIBED;
   document.getElementById("toggleViewBtn").textContent =
-    SHOW_ONLY_SUBSCRIBED ? "View All Chokepoints" : "Show My List";
+    SHOW_ONLY_SUBSCRIBED ? "View All Areas" : "Show My Areas";
   render();
 };
 
