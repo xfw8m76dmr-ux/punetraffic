@@ -70,6 +70,7 @@ header {
   color: white;
   padding: 16px;
   text-align: center;
+  position: relative;
 }
 
 header p {
@@ -240,6 +241,28 @@ footer {
 .area-card {
   gap: 16px; /* separates header and list cleanly */
 }
+
+    /*************************************************
+ * SHARE BUTTON
+ *************************************************/
+.share-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.share-btn:hover {
+  opacity: 1;
+}
+
+.share-btn svg {
+  display: block;
+}
   </style>
 </head>
 
@@ -247,6 +270,20 @@ footer {
 
 <header>
   <h2>🚦 Pune Traffic Alerts</h2>
+  <button id="nativeShareBtn" class="share-btn" aria-label="Share Pune Traffic Alerts">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="36"
+    height="36"
+    viewBox="0 0 44 44"
+  >
+    <circle cx="22" cy="22" r="22" fill="#000000" />
+    <path
+      fill="#ffffff"
+      d="M25 8 L36 19 L25 30 L25 22 C15 22 11 27 11 34 C11 22 16 14 25 14 Z"
+    />
+  </svg>
+</button>
   <p>
     We monitor traffic every 10 minutes and alert you automatically.<br>
     Daytime alerts (9 AM – 10 PM). Only when traffic gets jammed.<br>
