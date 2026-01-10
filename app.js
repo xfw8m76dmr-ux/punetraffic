@@ -175,7 +175,7 @@ function render() {
     : ALL_CHOKEPOINTS;
 
   if (list.length === 0) {
-    grid.innerHTML = "<p>No chokepoints found.</p>";
+    grid.innerHTML = `<p class="no_chokepoints">Add Chokepoints to receive Congestion Alerts. No Spam.</p>`;
     return;
   }
 
