@@ -265,12 +265,12 @@ async function load() {
 /*************************************************
  * TOGGLE VIEW
  *************************************************/
-document.getElementById("toggleViewBtn").onclick = () => {
-  SHOW_ONLY_SUBSCRIBED = !SHOW_ONLY_SUBSCRIBED;
-  document.getElementById("toggleViewBtn").textContent =
-    SHOW_ONLY_SUBSCRIBED ? "View All Areas" : "Show My Areas";
-  render();
-};
+// document.getElementById("toggleViewBtn").onclick = () => {
+//   SHOW_ONLY_SUBSCRIBED = !SHOW_ONLY_SUBSCRIBED;
+//   document.getElementById("toggleViewBtn").textContent =
+//     SHOW_ONLY_SUBSCRIBED ? "View All Areas" : "Show My Areas";
+//   render();
+// };
 
 /*************************************************
  * INIT
