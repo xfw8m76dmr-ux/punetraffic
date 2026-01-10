@@ -1,7 +1,8 @@
 /*************************************************
  * CONFIG
  *************************************************/
-const API_URL = "https://punetrafficcron.k7jzqg8c4k.workers.dev/api/chokepoints";
+const API_URL =
+  "https://punetrafficcron.k7jzqg8c4k.workers.dev/api/chokepoints";
 const STORAGE_KEY = "subscribed_chokepoints";
 
 /*************************************************
@@ -26,7 +27,7 @@ function saveSubscriptions(list) {
 }
 
 /*************************************************
- * ENV CHECKS (FROM YOUR FILE)
+ * ENV CHECKS
  *************************************************/
 const ua = navigator.userAgent.toLowerCase();
 const isIOS = /iphone|ipad|ipod/.test(ua);
@@ -59,7 +60,15 @@ function showToast(message) {
 }
 
 /*************************************************
- * 🔑 ONESIGNAL INIT
+ * GOOGLE MAPS
+ *************************************************/
+function getGoogleMapsUrl(lat, lng, name) {
+  const label = encodeURIComponent(name || "Chokepoint");
+  return `https://www.google.com/maps?q=${lat},${lng}(${label})`;
+}
+
+/*************************************************
+ * ONESIGNAL INIT
  *************************************************/
 let oneSignalResolve;
 const oneSignalReady = new Promise(r => (oneSignalResolve = r));
@@ -74,10 +83,9 @@ window.OneSignalDeferred.push(async function (OneSignal) {
 });
 
 /*************************************************
- * 🔔 SUBSCRIBE / UNSUBSCRIBE
+ * SUBSCRIBE / UNSUBSCRIBE
  *************************************************/
 async function toggleSubscription(chokepointId) {
-  /* -------- HARD BLOCKS -------- */
   if (isFacebookBrowser || isInstagramBrowser) {
     showToast(
       isIOS
@@ -92,17 +100,13 @@ async function toggleSubscription(chokepointId) {
     return;
   }
 
-  /* -------- WAIT FOR ONESIGNAL -------- */
-  const OneSignalInstance = await oneSignalReady;
+  const OneSignal = await oneSignalReady;
 
-  /* -------- REQUEST PERMISSION (SAFE) -------- */
   let permission;
   try {
-    permission =
-      await OneSignalInstance.Notifications.requestPermission();
-  } catch (e) {
-    console.error("Permission request failed", e);
-    showToast("❌ Failed to request permission");
+    permission = await OneSignal.Notifications.requestPermission();
+  } catch {
+    showToast("❌ Permission request failed");
     return;
   }
 
@@ -111,51 +115,46 @@ async function toggleSubscription(chokepointId) {
     return;
   }
 
-  /* -------- ENSURE PUSH SUB -------- */
-  await OneSignalInstance.User.PushSubscription.optIn();
+  await OneSignal.User.PushSubscription.optIn();
 
   const subs = getSubscriptions();
-  const alreadySubscribed = subs.includes(chokepointId);
+  const isSub = subs.includes(chokepointId);
 
   try {
-    if (alreadySubscribed) {
-      await OneSignalInstance.User.addTag(
-        `cp_${chokepointId}`,
-        "0"
-      );
-      saveSubscriptions(subs.filter(id => id !== chokepointId));
-      showToast("🔕 Alerts disabled");
-    } else {
-      await OneSignalInstance.User.addTag(
-        `cp_${chokepointId}`,
-        "1"
-      );
-      saveSubscriptions([...subs, chokepointId]);
-      showToast("🔔 Alerts enabled");
-    }
+    await OneSignal.User.addTag(
+      `cp_${chokepointId}`,
+      isSub ? "0" : "1"
+    );
 
+    saveSubscriptions(
+      isSub
+        ? subs.filter(id => id !== chokepointId)
+        : [...subs, chokepointId]
+    );
+
+    showToast(isSub ? "🔕 Alerts disabled" : "🔔 Alerts enabled");
     render();
-  } catch (e) {
-    console.error("Subscription error", e);
+  } catch {
     showToast("⚠️ Failed to update alerts");
   }
 }
 
+/*************************************************
+ * TIME FORMAT
+ *************************************************/
 function formatCheckedAt(checkedAt) {
   if (!checkedAt) return "Unknown";
 
-  const checkedTime = new Date(checkedAt);
-  const now = new Date();
-  const diffMs = now - checkedTime;
-  const diffMin = Math.floor(diffMs / 60000);
+  const t = new Date(checkedAt);
+  const diffMin = Math.floor((Date.now() - t) / 60000);
 
   if (diffMin < 1) return "Just now";
   if (diffMin < 60) return `${diffMin} min ago`;
 
-  const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr} hour${diffHr > 1 ? "s" : ""} ago`;
+  const hr = Math.floor(diffMin / 60);
+  if (hr < 24) return `${hr} hour${hr > 1 ? "s" : ""} ago`;
 
-  return checkedTime.toLocaleString("en-IN", {
+  return t.toLocaleString("en-IN", {
     day: "2-digit",
     month: "short",
     hour: "2-digit",
@@ -164,7 +163,7 @@ function formatCheckedAt(checkedAt) {
 }
 
 /*************************************************
- * RENDER UI
+ * RENDER
  *************************************************/
 function render() {
   const grid = document.getElementById("grid");
@@ -176,43 +175,52 @@ function render() {
     : ALL_CHOKEPOINTS;
 
   if (list.length === 0) {
-    grid.innerHTML = "<p>No chokepoints subscribed.</p>";
+    grid.innerHTML = "<p>No chokepoints found.</p>";
     return;
   }
 
   list.forEach(cp => {
-  const card = document.createElement("div");
-  card.className = "card";
+    const card = document.createElement("div");
+    card.className = `card ${cp.traffic.status}`;
 
-  const isSub = subs.includes(cp.id);
-  const lastChecked = formatCheckedAt(cp.traffic?.checkedAt);
+    const isSub = subs.includes(cp.id);
+    const lastChecked = formatCheckedAt(cp.traffic?.checkedAt);
+    const mapUrl = getGoogleMapsUrl(cp.lat, cp.lng, cp.name);
 
-  card.innerHTML = `
-    <h3>${cp.name}</h3>
-    <div class="area">${cp.area}</div>
+    card.innerHTML = `
+      <h3>${cp.name}</h3>
+      <div class="area">${cp.area}</div>
 
-    <div class="status ${cp.traffic.status}">
-      ${cp.traffic.label} • Delay ${Math.max(0, cp.traffic.delayMin)} min
-    </div>
+      <div class="status-row ${cp.traffic.status}">
+        ${cp.traffic.label} • Delay ${Math.max(0, cp.traffic.delayMin)} min
+      </div>
 
-    <div class="checked-at">
-      Last updated: ${lastChecked}
-    </div>
+      <div class="checked-at">
+        Last updated: ${lastChecked}
+      </div>
 
-    <button class="subscribe-btn ${isSub ? "subscribed" : "not-subscribed"}">
-      ${isSub ? "Unsubscribe" : "Subscribe"}
-    </button>
-  `;
+      <div class="card-actions">
+        <a href="${mapUrl}" target="_blank" rel="noopener" class="map-link">
+          📍 Open in Google Maps
+        </a>
 
-  card.querySelector("button").onclick = () =>
-    toggleSubscription(cp.id);
+        <button class="subscribe-btn ${
+          isSub ? "subscribed" : "not-subscribed"
+        }">
+          ${isSub ? "Unsubscribe" : "Subscribe"}
+        </button>
+      </div>
+    `;
 
-  grid.appendChild(card);
-});
+    card.querySelector("button").onclick = () =>
+      toggleSubscription(cp.id);
+
+    grid.appendChild(card);
+  });
 }
 
 /*************************************************
- * LOAD DATA
+ * LOAD
  *************************************************/
 async function load() {
   const res = await fetch(API_URL);
@@ -221,14 +229,12 @@ async function load() {
 }
 
 /*************************************************
- * TOGGLE VIEW BUTTON
+ * TOGGLE VIEW
  *************************************************/
 document.getElementById("toggleViewBtn").onclick = () => {
   SHOW_ONLY_SUBSCRIBED = !SHOW_ONLY_SUBSCRIBED;
   document.getElementById("toggleViewBtn").textContent =
-    SHOW_ONLY_SUBSCRIBED
-      ? "View All Chokepoints"
-      : "Show My List";
+    SHOW_ONLY_SUBSCRIBED ? "View All Chokepoints" : "Show My List";
   render();
 };
 
