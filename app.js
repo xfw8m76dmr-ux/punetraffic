@@ -4,6 +4,7 @@
 const API_URL =
   "https://punetrafficcron.k7jzqg8c4k.workers.dev/api/chokepoints";
 const STORAGE_KEY = "subscribed_areas";
+const MAX_AREA_SUBSCRIPTIONS = 2;
 
 /*************************************************
  * STATE
@@ -51,12 +52,14 @@ function showToast(message) {
     background: #111;
     color: #fff;
     padding: 12px 18px;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 14px;
     z-index: 99999;
+    text-align: center;
+    max-width: 90%;
   `;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+  setTimeout(() => t.remove(), 3200);
 }
 
 /*************************************************
@@ -100,6 +103,17 @@ async function toggleAreaSubscription(areaKey) {
     return;
   }
 
+  const subs = getSubscriptions();
+  const isSub = subs.includes(areaKey);
+
+  // 🚫 MAX 2 AREAS ENFORCEMENT
+  if (!isSub && subs.length >= MAX_AREA_SUBSCRIPTIONS) {
+    showToast(
+      "🚦 You can subscribe to alerts for only 2 areas. Unsubscribe from one area to add another."
+    );
+    return;
+  }
+
   const OneSignal = await oneSignalReady;
 
   const permission = await OneSignal.Notifications.requestPermission();
@@ -110,22 +124,28 @@ async function toggleAreaSubscription(areaKey) {
 
   await OneSignal.User.PushSubscription.optIn();
 
-  const subs = getSubscriptions();
-  const isSub = subs.includes(areaKey);
+  try {
+    await OneSignal.User.addTag(
+      `area_${areaKey}`,
+      isSub ? "0" : "1"
+    );
 
-  await OneSignal.User.addTag(
-    `area_${areaKey}`,
-    isSub ? "0" : "1"
-  );
+    saveSubscriptions(
+      isSub
+        ? subs.filter(a => a !== areaKey)
+        : [...subs, areaKey]
+    );
 
-  saveSubscriptions(
-    isSub
-      ? subs.filter(a => a !== areaKey)
-      : [...subs, areaKey]
-  );
+    showToast(
+      isSub
+        ? "🔕 Area alerts disabled"
+        : "🔔 Area alerts enabled"
+    );
 
-  showToast(isSub ? "🔕 Area alerts disabled" : "🔔 Area alerts enabled");
-  render();
+    render();
+  } catch {
+    showToast("⚠️ Failed to update alerts");
+  }
 }
 
 /*************************************************
@@ -187,6 +207,7 @@ function render() {
           ${isSub ? "Unsubscribe" : "Subscribe"}
         </button>
       </div>
+
       <div class="chokepoint-list"></div>
     `;
 
@@ -207,7 +228,9 @@ function render() {
         <div class="cp-name">${cp.name}</div>
         <div class="cp-status">${cp.traffic.label}</div>
         <div class="cp-time">Updated: ${lastChecked}</div>
-        <a href="${mapUrl}" target="_blank" class="map-link">📍 Map</a>
+        <a href="${mapUrl}" target="_blank" class="map-link">
+          📍 Open in Maps
+        </a>
       `;
 
       list.appendChild(item);
@@ -217,8 +240,11 @@ function render() {
   });
 
   if (!grid.children.length) {
-    grid.innerHTML =
-      `<p class="no_chokepoints">Subscribe to an area to receive traffic alerts.</p>`;
+    grid.innerHTML = `
+      <p class="no_chokepoints">
+        Subscribe to up to 2 areas to receive live traffic alerts.
+      </p>
+    `;
   }
 }
 
