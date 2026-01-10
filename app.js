@@ -192,8 +192,9 @@ function render() {
       <div class="area">${cp.area}</div>
 
       <div class="status-row ${cp.traffic.status}">
-        ${cp.traffic.label} • Delay ${Math.max(0, cp.traffic.delayMin)} min
+        ${cp.traffic.label} 
       </div>
+      // • Delay ${Math.max(0, cp.traffic.delayMin)} min   // not showing delay is it is for 200m around chokepoint and could confuse users
 
       <div class="checked-at">
         Last updated: ${lastChecked}
