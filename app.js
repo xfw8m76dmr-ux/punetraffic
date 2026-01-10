@@ -141,6 +141,28 @@ async function toggleSubscription(chokepointId) {
   }
 }
 
+function formatCheckedAt(checkedAt) {
+  if (!checkedAt) return "Unknown";
+
+  const checkedTime = new Date(checkedAt);
+  const now = new Date();
+  const diffMs = now - checkedTime;
+  const diffMin = Math.floor(diffMs / 60000);
+
+  if (diffMin < 1) return "Just now";
+  if (diffMin < 60) return `${diffMin} min ago`;
+
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr} hour${diffHr > 1 ? "s" : ""} ago`;
+
+  return checkedTime.toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
 /*************************************************
  * RENDER UI
  *************************************************/
@@ -159,27 +181,34 @@ function render() {
   }
 
   list.forEach(cp => {
-    const card = document.createElement("div");
-    card.className = "card";
+  const card = document.createElement("div");
+  card.className = "card";
 
-    const isSub = subs.includes(cp.id);
+  const isSub = subs.includes(cp.id);
+  const lastChecked = formatCheckedAt(cp.traffic?.checkedAt);
 
-    card.innerHTML = `
-      <h3>${cp.name}</h3>
-      <div class="area">${cp.area}</div>
-      <div class="status ${cp.traffic.status}">
-        ${cp.traffic.label} • Delay ${Math.max(0, cp.traffic.delayMin)} min
-      </div>
-      <button class="subscribe-btn ${isSub ? "subscribed" : "not-subscribed"}">
-        ${isSub ? "Unsubscribe" : "Subscribe"}
-      </button>
-    `;
+  card.innerHTML = `
+    <h3>${cp.name}</h3>
+    <div class="area">${cp.area}</div>
 
-    card.querySelector("button").onclick = () =>
-      toggleSubscription(cp.id);
+    <div class="status ${cp.traffic.status}">
+      ${cp.traffic.label} • Delay ${Math.max(0, cp.traffic.delayMin)} min
+    </div>
 
-    grid.appendChild(card);
-  });
+    <div class="checked-at">
+      Last updated: ${lastChecked}
+    </div>
+
+    <button class="subscribe-btn ${isSub ? "subscribed" : "not-subscribed"}">
+      ${isSub ? "Unsubscribe" : "Subscribe"}
+    </button>
+  `;
+
+  card.querySelector("button").onclick = () =>
+    toggleSubscription(cp.id);
+
+  grid.appendChild(card);
+});
 }
 
 /*************************************************
