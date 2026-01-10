@@ -247,7 +247,7 @@ function render() {
         <div class="cp-status">${cp.traffic.label}</div>
         <div class="cp-time">Updated: ${lastChecked}</div>
         <a href="${mapUrl}" target="_blank" class="map-link">
-          📍 Open in Maps
+          📍
         </a>
       `;
 
