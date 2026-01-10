@@ -9,6 +9,9 @@
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
   <style>
+/*************************************************
+ * BASE
+ *************************************************/
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont;
@@ -29,8 +32,9 @@ main {
   padding: 16px;
 }
 
-/* ---------- Segmented Control ---------- */
-
+/*************************************************
+ * SEGMENTED CONTROL
+ *************************************************/
 .controls {
   display: flex;
   justify-content: center;
@@ -59,125 +63,161 @@ main {
   color: white;
 }
 
-/* ---------- Grid ---------- */
-
+/*************************************************
+ * GRID
+ *************************************************/
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 16px;
 }
 
-/* ---------- Card ---------- */
-
-.card {
+/*************************************************
+ * AREA CARD
+ *************************************************/
+.area-card {
   background: white;
-  border-radius: 14px;
-  padding: 14px;
+  border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0,0,0,.06);
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
+}
+
+/* Header */
+.area-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.area-header h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/*************************************************
+ * SUBSCRIBE BUTTON (AREA LEVEL)
+ *************************************************/
+.subscribe-btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  white-space: nowrap;
+}
+
+.subscribe-btn:not(.subscribed) {
+  background: #16a34a;
+  color: white;
+}
+
+.subscribe-btn.subscribed {
+  background: white;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+}
+
+/*************************************************
+ * CHOKEPOINT LIST
+ *************************************************/
+.chokepoint-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/*************************************************
+ * SINGLE CHOKEPOINT
+ *************************************************/
+.chokepoint {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto auto;
+  gap: 4px 10px;
   border-left: 4px solid transparent;
 }
 
-.card.LOW { border-left-color: #16a34a; }
-.card.MODERATE { border-left-color: #d97706; }
-.card.HIGH { border-left-color: #dc2626; }
-.card.MEDIUM { border-left-color: #d97706; }
-.card.CRITICAL { border-left-color: #dc2626; }
-.card.SEVERE { border-left-color: #dc2626; }
-.card h3 {
-  margin: 0;
-  font-size: 1rem;
+/* Status border */
+.chokepoint.LOW { border-left-color: #16a34a; }
+.chokepoint.MEDIUM { border-left-color: #d97706; }
+.chokepoint.MODERATE { border-left-color: #d97706; }
+.chokepoint.HIGH { border-left-color: #dc2626; }
+.chokepoint.CRITICAL { border-left-color: #dc2626; }
+
+/* Name */
+.cp-name {
   font-weight: 600;
+  font-size: .95rem;
+  grid-column: 1 / 2;
 }
 
-
-.no_chokepoints {
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 100px;
-  font-weight: bold;
-}
-
-.area {
-  font-size: .8rem;
-  color: #6b7280;
-}
-
-/* ---------- Status ---------- */
-
-.status-row {
+/* Status label */
+.cp-status {
   font-size: .8rem;
   font-weight: 500;
-  margin-top: 4px;
 }
 
-.status-row.LOW { color: #16a34a; }
-.status-row.MODERATE { color: #d97706; }
-.status-row.HIGH { color: #dc2626; }
-.status-row.MEDIUM { color: #d97706; }
-.status-row.CRITICAL { color: #dc2626; }
-.status-row.SEVERE { color: #dc2626; }    
-.checked-at {
+.chokepoint.LOW .cp-status { color: #16a34a; }
+.chokepoint.MEDIUM .cp-status { color: #d97706; }
+.chokepoint.MODERATE .cp-status { color: #d97706; }
+.chokepoint.HIGH .cp-status { color: #dc2626; }
+.chokepoint.CRITICAL .cp-status { color: #dc2626; }
+
+/* Time */
+.cp-time {
   font-size: .75rem;
   color: #6b7280;
+  grid-column: 1 / 2;
 }
 
-/* ---------- Actions ---------- */
-
-.card-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
+/*************************************************
+ * MAP LINK
+ *************************************************/
 .map-link {
-  flex: 1;
-  text-align: center;
-  padding: 10px;
+  grid-column: 2 / 3;
+  grid-row: 1 / 4;
+  align-self: center;
+  padding: 8px 12px;
   border-radius: 10px;
   font-size: 13px;
-  background: #f3f4f6;
+  background: #e5e7eb;
   color: #111827;
   text-decoration: none;
   font-weight: 500;
 }
 
 .map-link:hover {
-  background: #e5e7eb;
+  background: #d1d5db;
 }
 
-/* ---------- Button ---------- */
-
-.subscribe-btn {
-  flex: 1;
-  padding: 10px;
-  border-radius: 10px;
-  font-size: 13px;
-  cursor: pointer;
-  border: none;
+/*************************************************
+ * EMPTY STATE
+ *************************************************/
+.no_chokepoints {
+  margin-top: 100px;
+  text-align: center;
+  font-weight: 600;
+  color: #374151;
 }
 
-.not-subscribed {
-  background: #16a34a;
-  color: white;
-}
-
-.subscribed {
-  background: white;
-  color: #dc2626;
-  border: 1px solid #dc2626;
-}
-
-/* ---------- Footer ---------- */
-
+/*************************************************
+ * FOOTER
+ *************************************************/
 footer {
   text-align: center;
   padding: 12px;
   font-size: 12px;
   color: #6b7280;
 }
+
 
   </style>
 </head>
