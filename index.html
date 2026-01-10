@@ -2,11 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Pune Traffic – Chokepoints</title>
+
+  <!-- Primary SEO -->
+  <title>Pune Traffic Alerts | Daytime Real-Time Traffic Notifications</title>
+  <meta name="description" content="Get automatic Pune traffic alerts during daytime (9 AM–10 PM). We monitor traffic every 10 minutes and send push notifications only when chokepoints in your subscribed areas get jammed. No login, no signup." />
+  <meta name="keywords" content="Pune traffic alerts, Pune traffic updates, real time traffic Pune, Pune chokepoints, traffic notification Pune" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Pune Traffic Alerts – Automatic Daytime Notifications" />
+  <meta property="og:description" content="We monitor Pune traffic every 10 minutes during daytime and alert you only when congestion is detected. No login. No signup." />
+  <meta property="og:site_name" content="Pune Traffic Alerts" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Pune Traffic Alerts" />
+  <meta name="twitter:description" content="Daytime Pune traffic alerts. Automatic, area-based, and sent only when traffic gets jammed." />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://punetrafficalerts.com/" />
 
   <!-- OneSignal SDK -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+
+  <!-- JSON-LD: WebSite -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Pune Traffic Alerts",
+    "url": "https://punetrafficalerts.com",
+    "description": "Automatic daytime traffic alerts for Pune, sent only when congestion is detected in subscribed areas."
+  }
+  </script>
+
+  <!-- JSON-LD: WebApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Pune Traffic Alerts",
+    "applicationCategory": "NavigationApplication",
+    "operatingSystem": "All",
+    "description": "Monitors Pune traffic every 10 minutes during daytime hours (9 AM–10 PM) and sends proactive push notifications only when chokepoints in subscribed areas get jammed. No login or signup required.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "INR"
+    }
+  }
+  </script>
 
   <style>
 /*************************************************
@@ -22,45 +68,20 @@ body {
 header {
   background: #111827;
   color: white;
-  padding: 14px;
+  padding: 16px;
   text-align: center;
+}
+
+header p {
+  margin-top: 6px;
+  font-size: 14px;
+  opacity: 0.8;
 }
 
 main {
   max-width: 900px;
   margin: auto;
   padding: 16px;
-}
-
-/*************************************************
- * SEGMENTED CONTROL
- *************************************************/
-.controls {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-
-.segmented {
-  display: inline-flex;
-  background: #e5e7eb;
-  border-radius: 10px;
-  padding: 4px;
-}
-
-.seg {
-  border: none;
-  background: transparent;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  cursor: pointer;
-  color: #374151;
-}
-
-.seg.active {
-  background: #2563eb;
-  color: white;
 }
 
 /*************************************************
@@ -85,7 +106,6 @@ main {
   gap: 12px;
 }
 
-/* Header */
 .area-header {
   display: flex;
   align-items: center;
@@ -100,7 +120,7 @@ main {
 }
 
 /*************************************************
- * SUBSCRIBE BUTTON (AREA LEVEL)
+ * SUBSCRIBE BUTTON
  *************************************************/
 .subscribe-btn {
   padding: 8px 14px;
@@ -123,16 +143,7 @@ main {
 }
 
 /*************************************************
- * CHOKEPOINT LIST
- *************************************************/
-.chokepoint-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/*************************************************
- * SINGLE CHOKEPOINT
+ * CHOKEPOINT
  *************************************************/
 .chokepoint {
   background: #f9fafb;
@@ -145,37 +156,31 @@ main {
   border-left: 4px solid transparent;
 }
 
-/* Status border */
 .chokepoint.LOW { border-left-color: #16a34a; }
-.chokepoint.MEDIUM { border-left-color: #d97706; }
+.chokepoint.MEDIUM,
 .chokepoint.MODERATE { border-left-color: #d97706; }
-.chokepoint.HIGH { border-left-color: #dc2626; }
+.chokepoint.HIGH,
 .chokepoint.CRITICAL { border-left-color: #dc2626; }
 
-/* Name */
 .cp-name {
   font-weight: 600;
   font-size: .95rem;
-  grid-column: 1 / 2;
 }
 
-/* Status label */
 .cp-status {
   font-size: .8rem;
   font-weight: 500;
 }
 
 .chokepoint.LOW .cp-status { color: #16a34a; }
-.chokepoint.MEDIUM .cp-status { color: #d97706; }
+.chokepoint.MEDIUM .cp-status,
 .chokepoint.MODERATE .cp-status { color: #d97706; }
-.chokepoint.HIGH .cp-status { color: #dc2626; }
+.chokepoint.HIGH .cp-status,
 .chokepoint.CRITICAL .cp-status { color: #dc2626; }
 
-/* Time */
 .cp-time {
   font-size: .75rem;
   color: #6b7280;
-  grid-column: 1 / 2;
 }
 
 /*************************************************
@@ -199,48 +204,35 @@ main {
 }
 
 /*************************************************
- * EMPTY STATE
- *************************************************/
-.no_chokepoints {
-  margin-top: 100px;
-  text-align: center;
-  font-weight: 600;
-  color: #374151;
-}
-
-/*************************************************
  * FOOTER
  *************************************************/
 footer {
   text-align: center;
-  padding: 12px;
+  padding: 14px;
   font-size: 12px;
   color: #6b7280;
 }
-
-
   </style>
 </head>
 
 <body>
+
 <header>
   <h2>🚦 Pune Traffic Alerts</h2>
-  <p>Google Traffic Insights update every 2 hours daytime.</p>
+  <p>
+    We monitor traffic every 10 minutes and alert you automatically.<br>
+    Daytime alerts (9 AM – 10 PM). Only when traffic gets jammed.<br>
+    No login. No signup. No fuss.
+  </p>
 </header>
 
 <main>
-  <!-- <div class="controls">
-    <button id="toggleViewBtn" class="toggle-view">
-      Show My List
-    </button>
-  </div> -->
-
   <div id="status"></div>
   <div id="grid" class="grid"></div>
 </main>
 
 <footer>
-  Live traffic • Subscribe for push alerts
+  Daytime Pune traffic alerts • Sent only when congestion is detected • Area-based notifications
 </footer>
 
 <script src="app.js"></script>
