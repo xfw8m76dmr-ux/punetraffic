@@ -299,3 +299,32 @@ async function load() {
  * INIT
  *************************************************/
 load();
+
+/*************************************************
+ * NATIVE SHARE BUTTON
+ *************************************************/
+document.addEventListener("DOMContentLoaded", () => {
+  const shareBtn = document.getElementById("nativeShareBtn");
+  if (!shareBtn) return;
+
+  shareBtn.addEventListener("click", async () => {
+    const shareData = {
+      title: "Pune Traffic Alerts",
+      text: "Automatic Pune traffic alerts. Updated every 10 minutes. Daytime alerts only when traffic gets jammed.",
+      url: window.location.origin
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(
+          `${shareData.text}\n${shareData.url}`
+        );
+        alert("Link copied to clipboard");
+      }
+    } catch (err) {
+      console.error("Share cancelled or failed", err);
+    }
+  });
+});
