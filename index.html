@@ -212,6 +212,34 @@ footer {
   font-size: 12px;
   color: #6b7280;
 }
+
+    /*************************************************
+ * FIX: SPACING BETWEEN CHOKEPOINT CARDS
+ *************************************************/
+
+/* Primary spacing */
+.chokepoint-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px; /* 👈 visible, mobile-friendly */
+}
+
+/* Fallback spacing (safety net) */
+.chokepoint {
+  margin-bottom: 14px;
+}
+
+/* Remove extra space after last card */
+.chokepoint:last-child {
+  margin-bottom: 0;
+}
+
+/*************************************************
+ * FIX: AREA CARD INTERNAL BREATHING
+ *************************************************/
+.area-card {
+  gap: 16px; /* separates header and list cleanly */
+}
   </style>
 </head>
 
