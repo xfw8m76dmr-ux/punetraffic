@@ -9,7 +9,7 @@
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
   <style>
-   body {
+body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont;
   background: #f5f7fa;
@@ -80,7 +80,6 @@ main {
   border-left: 4px solid transparent;
 }
 
-/* Traffic borders */
 .card.LOW { border-left-color: #16a34a; }
 .card.MODERATE { border-left-color: #d97706; }
 .card.HIGH { border-left-color: #dc2626; }
@@ -108,10 +107,39 @@ main {
 .status-row.MODERATE { color: #d97706; }
 .status-row.HIGH { color: #dc2626; }
 
+.checked-at {
+  font-size: .75rem;
+  color: #6b7280;
+}
+
+/* ---------- Actions ---------- */
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.map-link {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  background: #f3f4f6;
+  color: #111827;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.map-link:hover {
+  background: #e5e7eb;
+}
+
 /* ---------- Button ---------- */
 
 .subscribe-btn {
-  margin-top: auto;
+  flex: 1;
   padding: 10px;
   border-radius: 10px;
   font-size: 13px;
