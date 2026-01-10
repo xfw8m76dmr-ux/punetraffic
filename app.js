@@ -125,10 +125,13 @@ async function toggleAreaSubscription(areaKey) {
   await OneSignal.User.PushSubscription.optIn();
 
   try {
-    await OneSignal.User.addTag(
-      `area_${areaKey}`,
-      isSub ? "0" : "1"
-    );
+    if (isSub) {
+      // ✅ REMOVE TAG COMPLETELY
+      await OneSignal.User.removeTag(`area_${areaKey}`);
+    } else {
+      // ✅ ADD TAG
+      await OneSignal.User.addTag(`area_${areaKey}`, "1");
+    }
 
     saveSubscriptions(
       isSub
@@ -143,10 +146,12 @@ async function toggleAreaSubscription(areaKey) {
     );
 
     render();
-  } catch {
+  } catch (err) {
+    console.error(err);
     showToast("⚠️ Failed to update alerts");
   }
 }
+
 
 /*************************************************
  * TIME FORMAT
