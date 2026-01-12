@@ -1,4 +1,5 @@
-const SW_VERSION = "2026-01-12-3"; // CHANGE ON EVERY DEPLOY
+// CHANGE THIS ON EVERY DEPLOY
+const SW_VERSION = "2026-01-12-4";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
@@ -11,4 +12,11 @@ self.addEventListener("activate", (event) => {
     )
   );
   self.clients.claim();
+});
+
+// IMPORTANT: never cache API responses
+self.addEventListener("fetch", (event) => {
+  if (event.request.url.includes("/api/")) {
+    event.respondWith(fetch(event.request));
+  }
 });
