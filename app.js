@@ -2,7 +2,7 @@
  * CONFIG
  *************************************************/
 const API_URL =
-  "https://punetrafficcron.k7jzqg8c4k.workers.dev/api/chokepoints";
+  "http://trafficmatrix.k7jzqg8c4k.workers.dev/api/chokepoints";
 const STORAGE_KEY = "subscribed_areas";
 const MAX_AREA_SUBSCRIPTIONS = 2;
 
