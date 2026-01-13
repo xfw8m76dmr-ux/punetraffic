@@ -280,7 +280,7 @@ function render() {
  * LOAD
  *************************************************/
 async function load() {
-  const res = await fetch(API_URL);
+  const res = await fetch(`${API_URL}?_ts=${Date.now()}`, { cache: "no-store" });
   ALL_CHOKEPOINTS = await res.json();
   render();
 }
