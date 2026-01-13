@@ -334,6 +334,15 @@ err);
   });
 });
 
+function renderGlobalStatus() {
+  const { text, state } = getGlobalMonitoringStatus();
+  const el = document.getElementById("global-status");
+
+  el.textContent = text;
+  el.className = `status ${state}`;
+}
+
+renderGlobalStatus()
 
 
 window.load = load; // to make it accessible from the pull_to_refresh.js
