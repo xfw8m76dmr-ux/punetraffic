@@ -1,5 +1,5 @@
 // CHANGE THIS ON EVERY DEPLOY
-const SW_VERSION = "2026-01-12-4";
+const SW_VERSION = "2026-01-13-4";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
