@@ -329,5 +329,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+err);
+    }
+  });
+});
+
+
 
 window.load = load; // to make it accessible from the pull_to_refresh.js
