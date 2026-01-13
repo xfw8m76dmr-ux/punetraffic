@@ -274,6 +274,31 @@ footer {
 .share-btn svg {
   display: block;
 }
+
+/*************************************************
+ * PULL TO REFRESH
+ *************************************************/
+#ptr-indicator {
+  position: fixed;
+  top: -50px;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: #111827;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: top 0.25s ease;
+  z-index: 9999;
+}
+
+#ptr-indicator.active,
+#ptr-indicator.loading {
+  top: 0;
+}
+
   </style>
 </head>
 
