@@ -65,9 +65,18 @@ function showToast(message) {
 /*************************************************
  * GOOGLE MAPS
  *************************************************/
-function getGoogleMapsUrl(lat, lng, name) {
-  const label = encodeURIComponent(name);
-  return `https://www.google.com/maps?q=${lat},${lng}(${label})`;
+function getGoogleMapsUrl(cp) {
+  const originLat = cp.lat;
+  const originLng = cp.lng;
+
+  // ~500m north (latitude only)
+  const destLat = cp.lat + 0.0045;
+  const destLng = cp.lng;
+
+  return `https://www.google.com/maps/dir/?api=1` +
+         `&origin=${originLat},${originLng}` +
+         `&destination=${destLat},${destLng}` +
+         `&travelmode=driving`;
 }
 
 /*************************************************
