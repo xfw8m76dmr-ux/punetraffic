@@ -65,9 +65,9 @@ function showToast(message) {
 /*************************************************
  * GOOGLE MAPS
  *************************************************/
-function getGoogleMapsUrl(lat, lng, name) { 
-  const label = encodeURIComponent(name); 
-  return `https://www.google.com/maps?q=${lat},${lng}(${label})`; 
+function getGoogleMapsUrl(lat, lng, name) {
+  const label = encodeURIComponent(name);
+  return `https://www.google.com/maps?q=${lat},${lng}(${label})`;
 }
 
 /*************************************************
@@ -106,7 +106,6 @@ async function toggleAreaSubscription(areaKey) {
   const subs = getSubscriptions();
   const isSub = subs.includes(areaKey);
 
-  // 🚫 MAX 2 AREAS ENFORCEMENT
   if (!isSub && subs.length >= MAX_AREA_SUBSCRIPTIONS) {
     showToast(
       "🚦 You can subscribe to alerts for only 2 areas. Unsubscribe from one area to add another."
@@ -115,7 +114,6 @@ async function toggleAreaSubscription(areaKey) {
   }
 
   const OneSignal = await oneSignalReady;
-
   const permission = await OneSignal.Notifications.requestPermission();
   if (!permission) {
     showToast("🔕 Notifications blocked");
@@ -126,32 +124,22 @@ async function toggleAreaSubscription(areaKey) {
 
   try {
     if (isSub) {
-      // ✅ REMOVE TAG COMPLETELY
       await OneSignal.User.removeTag(`area_${areaKey}`);
     } else {
-      // ✅ ADD TAG
       await OneSignal.User.addTag(`area_${areaKey}`, "1");
     }
 
     saveSubscriptions(
-      isSub
-        ? subs.filter(a => a !== areaKey)
-        : [...subs, areaKey]
+      isSub ? subs.filter(a => a !== areaKey) : [...subs, areaKey]
     );
 
-    showToast(
-      isSub
-        ? "🔕 Area alerts disabled"
-        : "🔔 Area alerts enabled"
-    );
-
+    showToast(isSub ? "🔕 Area alerts disabled" : "🔔 Area alerts enabled");
     render();
   } catch (err) {
     console.error(err);
     showToast("⚠️ Failed to update alerts");
   }
 }
-
 
 /*************************************************
  * TIME FORMAT
@@ -198,19 +186,13 @@ function render() {
 
   const grouped = groupByArea(ALL_CHOKEPOINTS);
 
-  const sortedAreas = Object.entries(grouped).sort(
-    ([keyA], [keyB]) => {
-      const aSub = subs.includes(keyA);
-      const bSub = subs.includes(keyB);
-
-      // Subscribed areas first
-      if (aSub && !bSub) return -1;
-      if (!aSub && bSub) return 1;
-
-      // Stable fallback (alphabetical)
-      return keyA.localeCompare(keyB);
-    }
-  );
+  const sortedAreas = Object.entries(grouped).sort(([a], [b]) => {
+    const aSub = subs.includes(a);
+    const bSub = subs.includes(b);
+    if (aSub && !bSub) return -1;
+    if (!aSub && bSub) return 1;
+    return a.localeCompare(b);
+  });
 
   sortedAreas.forEach(([areaKey, area]) => {
     const isSub = subs.includes(areaKey);
@@ -218,7 +200,6 @@ function render() {
 
     const areaCard = document.createElement("div");
     areaCard.className = "area-card";
-
     areaCard.innerHTML = `
       <div class="area-header">
         <h2>${area.name}</h2>
@@ -229,9 +210,8 @@ function render() {
       <div class="chokepoint-list"></div>
     `;
 
-    areaCard
-      .querySelector("button")
-      .onclick = () => toggleAreaSubscription(areaKey);
+    areaCard.querySelector("button").onclick =
+      () => toggleAreaSubscription(areaKey);
 
     const list = areaCard.querySelector(".chokepoint-list");
 
@@ -240,24 +220,19 @@ function render() {
       const lastChecked = formatCheckedAt(cp.traffic?.checkedAt);
 
       const item = document.createElement("div");
-      item.className = `chokepoint ${cp.traffic.status}`;
-
+      item.className = `chokepoint ${cp.traffic?.status || "LOW"}`;
       item.innerHTML = `
         <div class="cp-name">${cp.name}</div>
-        <div class="cp-status">${cp.traffic.label}</div>
+        <div class="cp-status">${cp.traffic?.label || "Unknown"}</div>
         <div class="cp-time">Last checked: ${lastChecked}</div>
-        <a href="${mapUrl}" target="_blank" class="map-link">
-          📍
-        </a>
+        <a href="${mapUrl}" target="_blank" class="map-link">📍</a>
       `;
-
       list.appendChild(item);
     });
 
     grid.appendChild(areaCard);
   });
 
-  // Empty state
   if (!grid.children.length) {
     grid.innerHTML = `
       <p class="no_chokepoints">
@@ -266,15 +241,10 @@ function render() {
     `;
   }
 
-  // ⬆️ Auto-scroll when user has subscriptions
   if (subs.length > 0) {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 }
-
 
 /*************************************************
  * LOAD
@@ -284,16 +254,6 @@ async function load() {
   ALL_CHOKEPOINTS = await res.json();
   render();
 }
-
-/*************************************************
- * TOGGLE VIEW
- *************************************************/
-// document.getElementById("toggleViewBtn").onclick = () => {
-//   SHOW_ONLY_SUBSCRIBED = !SHOW_ONLY_SUBSCRIBED;
-//   document.getElementById("toggleViewBtn").textContent =
-//     SHOW_ONLY_SUBSCRIBED ? "View All Areas" : "Show My Areas";
-//   render();
-// };
 
 /*************************************************
  * INIT
@@ -310,7 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
   shareBtn.addEventListener("click", async () => {
     const shareData = {
       title: "Pune Traffic Alerts",
-      text: "Automatic Pune traffic alerts. Updated every 10 minutes. Daytime alerts only when traffic gets jammed.",
+      text: "Automatic Pune traffic alerts. Updated every 10 minutes.",
       url: window.location.origin
     };
 
@@ -324,25 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Link copied to clipboard");
       }
     } catch (err) {
-      console.error("Share cancelled or failed", err);
+      console.error("Share failed", err);
     }
   });
 });
-
-err);
-    }
-  });
-});
-
-function renderGlobalStatus() {
-  const { text, state } = getGlobalMonitoringStatus();
-  const el = document.getElementById("global-status");
-
-  el.textContent = text;
-  el.className = `status ${state}`;
-}
-
-//renderGlobalStatus()
-
-
-//window.load = load; // to make it accessible from the pull_to_refresh.js
