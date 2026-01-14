@@ -1,44 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-  
 <head>
   <meta charset="UTF-8" />
+
+  <!-- Favicons -->
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
-  <!-- Main favicon for Google & browsers -->
-<link rel="icon" href="/icons/icon-512.png" sizes="512x512" type="image/png">
+  <link rel="icon" href="/icons/icon-512.png" sizes="512x512" type="image/png">
+  <link rel="icon" href="/icons/icon-192.png" sizes="192x192" type="image/png">
 
-<!-- Fallback for older browsers -->
-<link rel="icon" href="/icons/icon-192.png" sizes="192x192" type="image/png">
+  <!-- PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#111827">
 
-
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#111827">
-  
-  <!-- Primary SEO -->
-  <title>Pune Traffic Alerts | Daytime Real-Time Traffic Notifications</title>
-  <meta name="description" content="Get automatic Pune traffic alerts during daytime (9 AM–10 PM). We monitor traffic every 10 minutes and send push notifications only when chokepoints in your subscribed areas get jammed. No login, no signup." />
-  <meta name="keywords" content="Pune traffic alerts, Pune traffic updates, real time traffic Pune, Pune chokepoints, traffic notification Pune" />
+  <!-- PRIMARY SEO -->
+  <title>Pune Traffic Today – Live Traffic Status, Congestion & Alerts</title>
+  <meta
+    name="description"
+    content="Check Pune traffic today with live traffic status, congestion updates, and real-time chokepoint alerts. Pune traffic is monitored every 10 minutes during daytime. No login required."
+  />
+  <meta
+    name="keywords"
+    content="pune traffic, pune traffic today, live pune traffic, pune traffic status, pune traffic updates, real time traffic pune"
+  />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Open Graph -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Pune Traffic Alerts – Automatic Daytime Notifications" />
-  <meta property="og:description" content="We monitor Pune traffic every 10 minutes during daytime and alert you only when congestion is detected. No login. No signup." />
-  <meta property="og:site_name" content="Pune Traffic Alerts" />
-
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Pune Traffic Alerts" />
-  <meta name="twitter:description" content="Daytime Pune traffic alerts. Automatic, area-based, and sent only when traffic gets jammed." />
 
   <!-- Canonical -->
   <link rel="canonical" href="https://www.punetrafficalerts.com/" />
 
-  <!-- OneSignal SDK -->
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Pune Traffic Today – Live Traffic Status & Alerts" />
+  <meta
+    property="og:description"
+    content="Live Pune traffic status with real-time congestion alerts. Get notified automatically when Pune traffic builds up in your area."
+  />
+  <meta property="og:site_name" content="Pune Traffic Alerts" />
+  <meta property="og:url" content="https://www.punetrafficalerts.com/" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Pune Traffic Today" />
+  <meta
+    name="twitter:description"
+    content="Live Pune traffic updates, congestion status, and automatic alerts for major Pune roads."
+  />
+
+  <!-- OneSignal -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
   <!-- JSON-LD: WebSite -->
@@ -47,8 +56,8 @@
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Pune Traffic Alerts",
-    "url": "https://punetrafficalerts.com",
-    "description": "Automatic daytime traffic alerts for Pune, sent only when congestion is detected in subscribed areas."
+    "url": "https://www.punetrafficalerts.com",
+    "description": "Live Pune traffic status with real-time congestion and chokepoint alerts."
   }
   </script>
 
@@ -60,7 +69,7 @@
     "name": "Pune Traffic Alerts",
     "applicationCategory": "NavigationApplication",
     "operatingSystem": "All",
-    "description": "Monitors Pune traffic every 10 minutes during daytime hours (9 AM–10 PM) and sends proactive push notifications only when chokepoints in subscribed areas get jammed. No login or signup required.",
+    "description": "Monitors Pune traffic every 10 minutes during daytime and sends real-time alerts when congestion is detected.",
     "offers": {
       "@type": "Offer",
       "price": "0",
@@ -69,297 +78,154 @@
   }
   </script>
 
+  <!-- JSON-LD: FAQ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is Pune traffic live on this website?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Pune traffic is monitored live and updated every 10 minutes during daytime hours."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does this site show Pune traffic today?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. This website shows Pune traffic today with real-time congestion and chokepoint updates."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How often is Pune traffic updated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Pune traffic is updated every 10 minutes between 9 AM and 10 PM."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need to sign up to check Pune traffic?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. No signup or login is required to view Pune traffic or receive alerts."
+        }
+      }
+    ]
+  }
+  </script>
+
   <style>
-/*************************************************
- * BASE
- *************************************************/
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont;
-  background: #f5f7fa;
-  color: #111;
-}
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+      background: #f5f7fa;
+      color: #111;
+    }
 
-header {
-  background: #111827;
-  color: white;
-  padding: 16px;
-  text-align: center;
-  position: relative;
-}
+    header {
+      background: #111827;
+      color: white;
+      padding: 16px;
+      text-align: center;
+      position: relative;
+    }
 
-header p {
-  margin-top: 6px;
-  font-size: 14px;
-  opacity: 0.8;
-}
+    header p {
+      margin-top: 6px;
+      font-size: 14px;
+      opacity: 0.85;
+    }
 
-main {
-  max-width: 900px;
-  margin: auto;
-  padding: 16px;
-}
+    main {
+      max-width: 900px;
+      margin: auto;
+      padding: 16px;
+    }
 
-/*************************************************
- * GRID
- *************************************************/
-.grid {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
+    .seo-intro {
+      max-width: 900px;
+      margin: 12px auto 0;
+      padding: 0 16px;
+      font-size: 14px;
+      color: #374151;
+      line-height: 1.6;
+    }
 
-/*************************************************
- * AREA CARD
- *************************************************/
-.area-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0,0,0,.06);
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
 
-.area-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
+    footer {
+      text-align: center;
+      padding: 14px;
+      font-size: 12px;
+      color: #6b7280;
+    }
 
-.area-header h2 {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 700;
-}
+    #ptr-indicator {
+      position: fixed;
+      top: -50px;
+      left: 0;
+      right: 0;
+      height: 50px;
+      background: #111827;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: top 0.25s ease;
+      z-index: 9999;
+    }
 
-/*************************************************
- * SUBSCRIBE BUTTON
- *************************************************/
-.subscribe-btn {
-  padding: 8px 14px;
-  border-radius: 10px;
-  font-size: 13px;
-  cursor: pointer;
-  border: none;
-  white-space: nowrap;
-}
-
-.subscribe-btn:not(.subscribed) {
-  background: #16a34a;
-  color: white;
-}
-
-.subscribe-btn.subscribed {
-  background: white;
-  color: #dc2626;
-  border: 1px solid #dc2626;
-}
-
-/*************************************************
- * CHOKEPOINT
- *************************************************/
-.chokepoint {
-  background: #f9fafb;
-  border-radius: 12px;
-  padding: 12px;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-rows: auto auto auto;
-  gap: 4px 10px;
-  border-left: 4px solid transparent;
-}
-
-.chokepoint.LOW { border-left-color: #16a34a; }
-.chokepoint.MEDIUM,
-.chokepoint.MODERATE { border-left-color: #d97706; }
-.chokepoint.HIGH,
-.chokepoint.CRITICAL { border-left-color: #dc2626; }
-
-.cp-name {
-  font-weight: 600;
-  font-size: .95rem;
-}
-
-.cp-status {
-  font-size: .8rem;
-  font-weight: 500;
-}
-
-.chokepoint.LOW .cp-status { color: #16a34a; }
-.chokepoint.MEDIUM .cp-status,
-.chokepoint.MODERATE .cp-status { color: #d97706; }
-.chokepoint.HIGH .cp-status,
-.chokepoint.CRITICAL .cp-status { color: #dc2626; }
-
-.cp-time {
-  font-size: .75rem;
-  color: #6b7280;
-}
-
-/*************************************************
- * MAP LINK
- *************************************************/
-.map-link {
-  grid-column: 2 / 3;
-  grid-row: 1 / 4;
-  align-self: center;
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-size: 13px;
-  background: #e5e7eb;
-  color: #111827;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.map-link:hover {
-  background: #d1d5db;
-}
-
-/*************************************************
- * FOOTER
- *************************************************/
-footer {
-  text-align: center;
-  padding: 14px;
-  font-size: 12px;
-  color: #6b7280;
-}
-
-    /*************************************************
- * FIX: SPACING BETWEEN CHOKEPOINT CARDS
- *************************************************/
-
-/* Primary spacing between cards */
-.chokepoint-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px; /* 👈 tighter, premium */
-}
-
-/* Minimal fallback only */
-.chokepoint {
-  margin-bottom: 6px;
-}
-
-.chokepoint:last-child {
-  margin-bottom: 0;
-}
-
-/* Header vs list separation */
-.area-card {
-  gap: 12px;
-}
-
-    /*************************************************
- * SHARE BUTTON
- *************************************************/
-.share-btn {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  opacity: 0.85;
-}
-
-.share-btn:hover {
-  opacity: 1;
-}
-
-.share-btn svg {
-  display: block;
-}
-
-/*************************************************
- * PULL TO REFRESH
- *************************************************/
-#ptr-indicator {
-  position: fixed;
-  top: -50px;
-  left: 0;
-  right: 0;
-  height: 50px;
-  background: #111827;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  transition: top 0.25s ease;
-  z-index: 9999;
-}
-
-#ptr-indicator.active,
-#ptr-indicator.loading {
-  top: 0;
-}
-
-    .status {
-  padding: 10px 14px;
-  margin: 12px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.status.active {
-  background: #e8f5e9;
-  color: #1b5e20;
-}
-
-.status.inactive {
-  background: #f1f3f4;
-  color: #555;
-}
-
+    #ptr-indicator.active,
+    #ptr-indicator.loading {
+      top: 0;
+    }
   </style>
 </head>
 
 <body>
+
 <div id="ptr-indicator">↓ Pull to refresh</div>
 
-
 <header>
-  <h2>🚦 Pune Traffic Alerts</h2>
-  <button id="nativeShareBtn" class="share-btn" aria-label="Share Pune Traffic Alerts">
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="36"
-    height="36"
-    viewBox="0 0 44 44"
-  >
-    <circle cx="22" cy="22" r="22" fill="#000000" />
-    <path
-      fill="#ffffff"
-      d="M25 8 L36 19 L25 30 L25 22 C15 22 11 27 11 34 C11 22 16 14 25 14 Z"
-    />
-  </svg>
-</button>
+  <h1>🚦 Pune Traffic – Live Status & Real-Time Alerts</h1>
   <p>
-    We monitor traffic every 10 minutes and alert you automatically.
-Daytime alerts (9 AM – 10 PM), only when traffic gets jammed.
-No login. No signup. No fuss.
+    We monitor Pune traffic every 10 minutes and alert you automatically.
+    Daytime alerts (9 AM – 10 PM), only when traffic gets jammed.
+    No login. No signup.
   </p>
 </header>
 
-<div id="global-status" class="status"></div>
-  
+<section class="seo-intro">
+  <p>
+    Pune traffic can change quickly due to office rush, road work, accidents,
+    and weather. Pune Traffic Alerts shows live Pune traffic status,
+    congestion levels, and real-time chokepoints across major Pune roads.
+    Enable alerts to stay ahead of traffic before you start your journey.
+  </p>
+</section>
+
 <main>
   <div id="status"></div>
   <div id="grid" class="grid"></div>
 </main>
 
 <footer>
-  Daytime Pune traffic alerts • Sent only when congestion is detected • Area-based notifications
+  Live Pune traffic monitoring • Real-time congestion alerts • Area-based Pune traffic notifications
 </footer>
 
 <script src="app.js"></script>
 <script src="pull-to-refresh.js"></script>
+
 </body>
 </html>
