@@ -342,7 +342,7 @@ function renderGlobalStatus() {
   el.className = `status ${state}`;
 }
 
-renderGlobalStatus()
+//renderGlobalStatus()
 
 
 window.load = load; // to make it accessible from the pull_to_refresh.js
