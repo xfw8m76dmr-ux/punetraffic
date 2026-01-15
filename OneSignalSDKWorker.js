@@ -10,13 +10,12 @@ importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
  * Install / Activate
  */
 self.addEventListener("install", () => self.skipWaiting());
-
 self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
 /*************************************************
- * IndexedDB helpers (MUST match quiet-hours.js)
+ * IndexedDB helpers (read-only)
  *************************************************/
 const DB_NAME = "pta_prefs";
 const STORE = "prefs";
@@ -27,10 +26,7 @@ function getQuietHours() {
     const openReq = indexedDB.open(DB_NAME, 1);
 
     openReq.onerror = () => resolve(null);
-
-    openReq.onupgradeneeded = () => {
-      openReq.result.createObjectStore(STORE);
-    };
+    openReq.onupgradeneeded = () => {}; // 🔒 do NOT create stores here
 
     openReq.onsuccess = () => {
       const db = openReq.result;
@@ -48,7 +44,7 @@ function getQuietHours() {
  * 🔕 Intercept notification display
  *************************************************/
 self.addEventListener("notificationreceived", (event) => {
-  // 🚨 THIS IS CRITICAL
+  // 🚨 Critical: stop OneSignal auto-display
   event.preventDefault();
 
   event.waitUntil((async () => {
@@ -57,7 +53,7 @@ self.addEventListener("notificationreceived", (event) => {
 
     const prefs = await getQuietHours();
 
-    // If quiet hours NOT set → show
+    // No quiet hours → show
     if (!prefs || prefs.start == null || prefs.end == null) {
       self.registration.showNotification(
         notification.title,
@@ -67,7 +63,7 @@ self.addEventListener("notificationreceived", (event) => {
     }
 
     const { start, end } = prefs;
-    const hour = new Date().getHours(); // local time (IST on user device)
+    const hour = new Date().getHours();
 
     const isQuietTime =
       start < end
@@ -75,11 +71,12 @@ self.addEventListener("notificationreceived", (event) => {
         : hour >= start || hour < end;
 
     if (isQuietTime) {
-      // ❌ SUPPRESS (do nothing)
+      // ❌ Suppress silently
+      notification.close();
       return;
     }
 
-    // ✅ SHOW
+    // ✅ Show notification
     self.registration.showNotification(
       notification.title,
       notification.options
