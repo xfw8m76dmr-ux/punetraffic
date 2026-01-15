@@ -6,6 +6,10 @@
   const saveBtn = document.getElementById("saveQuiet");
 
   if (!quietBtn || !modal) return;
+    // Reveal button after 5 seconds
+  setTimeout(() => {
+    quietBtn.classList.add("visible");
+  }, 5000);
 
   function buildTimeOptions() {
     for (let h = 0; h < 24; h++) {
