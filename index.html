@@ -390,22 +390,31 @@ footer {
   display: block;
 }
 
-    /*************************************************
- * QUIET HOURS BUTTON
+/*************************************************
+ * QUIET HOURS BUTTON (CENTERED, DELAYED)
  *************************************************/
 .quiet-btn {
-  margin-top: 10px;
-  padding: 6px 12px;
+  display: none; /* hidden initially */
+  margin: 12px auto 0;
+  padding: 7px 14px;
   font-size: 13px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.4);
-  background: rgba(255,255,255,0.12);
-  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: #020617; /* dark slate */
+  color: #e5e7eb;
   cursor: pointer;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.quiet-btn.visible {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .quiet-btn:hover {
-  background: rgba(255,255,255,0.18);
+  background: #020617;
+  color: #ffffff;
 }
 
 /*************************************************
