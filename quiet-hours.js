@@ -9,7 +9,7 @@
 
   // Reveal button after 5 seconds
   setTimeout(() => {
-    quietBtn.classList.add("visible");
+   // quietBtn.classList.add("visible");
   }, 5000);
 
   /*************************************************
