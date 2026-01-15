@@ -6,11 +6,52 @@
   const saveBtn = document.getElementById("saveQuiet");
 
   if (!quietBtn || !modal) return;
-    // Reveal button after 5 seconds
+
+  // Reveal button after 5 seconds
   setTimeout(() => {
     quietBtn.classList.add("visible");
   }, 5000);
 
+  /*************************************************
+   * IndexedDB helpers
+   *************************************************/
+  const DB_NAME = "pta_prefs";
+  const STORE = "prefs";
+  const KEY = "quiet_hours";
+
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 1);
+
+      req.onupgradeneeded = () => {
+        req.result.createObjectStore(STORE);
+      };
+
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function saveQuietHours(start, end) {
+    const db = await openDB();
+    const tx = db.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).put({ start, end }, KEY);
+  }
+
+  async function loadQuietHours() {
+    const db = await openDB();
+    const tx = db.transaction(STORE, "readonly");
+    const req = tx.objectStore(STORE).get(KEY);
+
+    return new Promise((resolve) => {
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => resolve(null);
+    });
+  }
+
+  /*************************************************
+   * UI helpers
+   *************************************************/
   function buildTimeOptions() {
     for (let h = 0; h < 24; h++) {
       const hour12 = h % 12 || 12;
@@ -33,6 +74,9 @@
       `🔕 Quiet hours set to ${formatHour(start)} – ${formatHour(end)}`;
   }
 
+  /*************************************************
+   * Events
+   *************************************************/
   quietBtn.addEventListener("click", () => {
     modal.style.display = "flex";
   });
@@ -41,27 +85,25 @@
     if (e.target === modal) modal.style.display = "none";
   });
 
-  saveBtn.addEventListener("click", () => {
+  saveBtn.addEventListener("click", async () => {
     const start = Number(startSel.value);
     const end = Number(endSel.value);
 
-    localStorage.setItem(
-      "quiet_hours",
-      JSON.stringify({ start, end })
-    );
-
+    await saveQuietHours(start, end);
     updateQuietLabel(start, end);
     modal.style.display = "none";
   });
 
-  // Init
+  /*************************************************
+   * Init
+   *************************************************/
   buildTimeOptions();
 
-  const saved = localStorage.getItem("quiet_hours");
-  if (saved) {
-    const { start, end } = JSON.parse(saved);
-    startSel.value = start;
-    endSel.value = end;
-    updateQuietLabel(start, end);
-  }
+  loadQuietHours().then((prefs) => {
+    if (!prefs) return;
+
+    startSel.value = prefs.start;
+    endSel.value = prefs.end;
+    updateQuietLabel(prefs.start, prefs.end);
+  });
 })();
