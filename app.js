@@ -204,7 +204,7 @@ function render() {
       <div class="area-header">
         <h2>${area.name}</h2>
         <button class="subscribe-btn ${isSub ? "subscribed" : ""}">
-          ${isSub ? "Stop Alerts" : "Alert Me"}
+          ${isSub ? "Stop Alerts" : "🔔 Alert me when Traffic Jams"}
         </button>
       </div>
       <div class="chokepoint-list"></div>
