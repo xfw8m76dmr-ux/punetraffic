@@ -120,6 +120,7 @@
     ]
   }
   </script>
+  
 
   <style>
 /*************************************************
@@ -405,7 +406,9 @@ footer {
   </p>
 </header>
 
-
+<button id="quietBtn" class="quiet-btn">
+  🔕 Set quiet hours
+</button>
 
 <main>
   <div id="status"></div>
@@ -418,7 +421,8 @@ footer {
 
 <script src="app.js"></script>
 <script src="pull-to-refresh.js"></script>
-
+<script src="quiet-hours.js"></script>
+  
   <section class="seo-intro">
   <p>
     Pune traffic can change quickly due to office rush, road work, accidents,
@@ -427,5 +431,18 @@ footer {
     Enable alerts to stay ahead of traffic before you start your journey.
   </p>
 </section>
+
+  <div id="quietModal">
+  <div class="box">
+    <h3>🔕 Quiet hours</h3>
+
+    <div class="row">
+      <select id="quietStart"></select>
+      <select id="quietEnd"></select>
+    </div>
+
+    <button id="saveQuiet">Save</button>
+  </div>
+</div>
 </body>
 </html>
