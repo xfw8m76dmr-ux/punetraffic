@@ -389,6 +389,74 @@ footer {
 .share-btn svg {
   display: block;
 }
+
+    /*************************************************
+ * QUIET HOURS BUTTON
+ *************************************************/
+.quiet-btn {
+  margin-top: 10px;
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.12);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.quiet-btn:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+/*************************************************
+ * QUIET HOURS MODAL
+ *************************************************/
+#quietModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+#quietModal .box {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  width: 90%;
+  max-width: 320px;
+  text-align: center;
+}
+
+#quietModal h3 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+}
+
+#quietModal .row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+#quietModal select {
+  flex: 1;
+  padding: 6px;
+  font-size: 14px;
+}
+
+#quietModal button {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  background: #111827;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
 </style>
 </head>
 
