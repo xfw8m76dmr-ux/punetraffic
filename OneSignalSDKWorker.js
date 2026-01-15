@@ -1,5 +1,5 @@
 // CHANGE THIS ON EVERY DEPLOY
-const SW_VERSION = "2026-01-15-quiet-idb";
+const SW_VERSION = "2026-01-15--2-quiet-idb";
 
 /**
  * Load OneSignal Service Worker
@@ -48,13 +48,16 @@ function getQuietHours() {
  * 🔕 Intercept notification display
  *************************************************/
 self.addEventListener("notificationreceived", (event) => {
+  // 🚨 THIS IS CRITICAL
+  event.preventDefault();
+
   event.waitUntil((async () => {
     const notification = event.notification;
     if (!notification) return;
 
     const prefs = await getQuietHours();
 
-    // If no quiet hours set → allow notification
+    // If quiet hours NOT set → show
     if (!prefs || prefs.start == null || prefs.end == null) {
       self.registration.showNotification(
         notification.title,
@@ -64,7 +67,7 @@ self.addEventListener("notificationreceived", (event) => {
     }
 
     const { start, end } = prefs;
-    const hour = new Date().getHours();
+    const hour = new Date().getHours(); // local time (IST on user device)
 
     const isQuietTime =
       start < end
@@ -72,12 +75,11 @@ self.addEventListener("notificationreceived", (event) => {
         : hour >= start || hour < end;
 
     if (isQuietTime) {
-      // ❌ Suppress silently
-      notification.close();
+      // ❌ SUPPRESS (do nothing)
       return;
     }
 
-    // ✅ Show notification
+    // ✅ SHOW
     self.registration.showNotification(
       notification.title,
       notification.options
