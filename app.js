@@ -9,7 +9,7 @@ const MAX_AREA_SUBSCRIPTIONS = 2;
 /*************************************************
  * STATE
  *************************************************/
-let ALL_CHOKEPOINTS = window.__PRE_LOADCHOKEPOINTS__ || [];
+let ALL_CHOKEPOINTS = [];
 if(window.__PRE_LOADCHOKEPOINTS__) {
   console.log('Found preloaded chokepoints');
 } else {
@@ -259,6 +259,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (ALL_CHOKEPOINTS.length) {
     // First load: render preloaded data
     render();
+  } else {
+    refreshChokepoints()
   }
 });
 
