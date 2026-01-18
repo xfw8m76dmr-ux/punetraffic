@@ -300,3 +300,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+window.refreshChokepoints = refreshChokepoints;
