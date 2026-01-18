@@ -9,7 +9,7 @@ const MAX_AREA_SUBSCRIPTIONS = 2;
 /*************************************************
  * STATE
  *************************************************/
-let ALL_CHOKEPOINTS = [];
+let ALL_CHOKEPOINTS = window.__PRE_LOADCHOKEPOINTS__ || [];
 let SHOW_ONLY_SUBSCRIBED = false;
 
 /*************************************************
@@ -247,18 +247,30 @@ function render() {
 }
 
 /*************************************************
- * LOAD
+ * INITIAL LOAD
  *************************************************/
-async function load() {
-  const res = await fetch(`${API_URL}?_ts=${Date.now()}`, { cache: "no-store" });
-  ALL_CHOKEPOINTS = await res.json();
-  render();
-}
+document.addEventListener("DOMContentLoaded", () => {
+  if (ALL_CHOKEPOINTS.length) {
+    // First load: render preloaded data
+    render();
+  }
+});
 
 /*************************************************
- * INIT
+ * OPTIONAL BACKGROUND REFRESH (every 10 min)
  *************************************************/
-load();
+async function refreshChokepoints() {
+  try {
+    const res = await fetch(`${API_URL}?_ts=${Date.now()}`, { cache: "no-store" });
+    ALL_CHOKEPOINTS = await res.json();
+    render();
+  } catch (err) {
+    console.error("Failed to refresh chokepoints", err);
+  }
+}
+
+// Uncomment if you want live refresh
+// setInterval(refreshChokepoints, 10 * 60 * 1000);
 
 /*************************************************
  * NATIVE SHARE BUTTON
