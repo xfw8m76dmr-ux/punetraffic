@@ -303,7 +303,7 @@ main {
   font-weight: 500;
 }
 
-.chokepoint.LOW .cp-status { color: #16a34a; }
+.chokepoint.LOW .cp-status { color: darkgreen; }
 .chokepoint.MEDIUM .cp-status,
 .chokepoint.MODERATE .cp-status { color: #d97706; }
 .chokepoint.HIGH .cp-status,
