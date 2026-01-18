@@ -110,7 +110,7 @@ return `<!DOCTYPE html>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
 <style>
-${/* 🔥 KEEP YOUR FULL CSS HERE - unchanged */""}
+${STYLESHEET}
 </style>
 </head>
 
@@ -152,3 +152,348 @@ window.__PRE_LOADCHOKEPOINTS__ = ${JSON.stringify(chokepoints)};
 </body>
 </html>`;
 }
+
+const STYLESHEET = `/*************************************************
+ * BASE
+ *************************************************/
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  background: #f5f7fa;
+  color: #111;
+}
+
+header {
+  background: #111827;
+  color: #ffffff;
+  padding: 16px;
+  text-align: center;
+  position: relative;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+header p {
+  margin-top: 6px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+main {
+  max-width: 900px;
+  margin: auto;
+  padding: 16px;
+}
+
+/*************************************************
+ * SEO INTRO
+ *************************************************/
+.seo-intro {
+  max-width: 900px;
+  margin: 12px auto 0;
+  padding: 0 16px;
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.6;
+}
+
+/*************************************************
+ * GRID
+ *************************************************/
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/*************************************************
+ * AREA CARD
+ *************************************************/
+.area-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.area-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.area-header h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/*************************************************
+ * SUBSCRIBE BUTTON
+ *************************************************/
+.subscribe-btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.subscribe-btn:not(.subscribed) {
+  background: #16a34a;
+  color: white;
+}
+
+.subscribe-btn.subscribed {
+  background: #ffffff;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+}
+
+/*************************************************
+ * CHOKEPOINT LIST
+ *************************************************/
+.chokepoint-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/*************************************************
+ * CHOKEPOINT CARD
+ *************************************************/
+.chokepoint {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto auto;
+  gap: 4px 10px;
+  border-left: 4px solid transparent;
+}
+
+.chokepoint.LOW { border-left-color: #16a34a; }
+.chokepoint.MEDIUM,
+.chokepoint.MODERATE { border-left-color: #d97706; }
+.chokepoint.HIGH,
+.chokepoint.CRITICAL { border-left-color: #dc2626; }
+
+/*************************************************
+ * CHOKEPOINT TEXT
+ *************************************************/
+.cp-name {
+  font-weight: 600;
+  font-size: .95rem;
+}
+
+.cp-status {
+  font-size: .8rem;
+  font-weight: 500;
+}
+
+.chokepoint.LOW .cp-status { color: #16a34a; }
+.chokepoint.MEDIUM .cp-status,
+.chokepoint.MODERATE .cp-status { color: #d97706; }
+.chokepoint.HIGH .cp-status,
+.chokepoint.CRITICAL .cp-status { color: #dc2626; }
+
+.cp-time {
+  font-size: .75rem;
+  color: #6b7280;
+}
+
+/*************************************************
+ * MAP LINK
+ *************************************************/
+.map-link {
+  grid-column: 2 / 3;
+  grid-row: 1 / 4;
+  align-self: center;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  background: #e5e7eb;
+  color: #111827;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.map-link:hover {
+  background: #d1d5db;
+}
+
+/*************************************************
+ * STATUS BANNER
+ *************************************************/
+.status {
+  padding: 10px 14px;
+  margin: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.status.active {
+  background: #e8f5e9;
+  color: #1b5e20;
+}
+
+.status.inactive {
+  background: #f1f3f4;
+  color: #555;
+}
+
+/*************************************************
+ * EMPTY STATE
+ *************************************************/
+.no_chokepoints {
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+  padding: 24px 0;
+}
+
+/*************************************************
+ * FOOTER
+ *************************************************/
+footer {
+  text-align: center;
+  padding: 14px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/*************************************************
+ * PULL TO REFRESH
+ *************************************************/
+#ptr-indicator {
+  position: fixed;
+  top: -50px;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: #111827;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: top 0.25s ease;
+  z-index: 9999;
+}
+
+#ptr-indicator.active,
+#ptr-indicator.loading {
+  top: 0;
+}
+
+/*************************************************
+ * SHARE BUTTON
+ *************************************************/
+.share-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.share-btn:hover {
+  opacity: 1;
+}
+
+.share-btn svg {
+  display: block;
+}
+
+/*************************************************
+ * QUIET HOURS BUTTON (CENTERED, DELAYED)
+ *************************************************/
+.quiet-btn {
+  display: none; /* hidden initially */
+  margin: 12px auto 0;
+  padding: 7px 14px;
+  font-size: 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: #020617; /* dark slate */
+  color: #e5e7eb;
+  cursor: pointer;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.quiet-btn.visible {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.quiet-btn:hover {
+  background: #020617;
+  color: #ffffff;
+}
+
+/*************************************************
+ * QUIET HOURS MODAL
+ *************************************************/
+#quietModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+#quietModal .box {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  width: 90%;
+  max-width: 320px;
+  text-align: center;
+}
+
+#quietModal h3 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+}
+
+#quietModal .row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+#quietModal select {
+  flex: 1;
+  padding: 6px;
+  font-size: 14px;
+}
+
+#quietModal button {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  background: #111827;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+`
