@@ -10,6 +10,12 @@ const MAX_AREA_SUBSCRIPTIONS = 2;
  * STATE
  *************************************************/
 let ALL_CHOKEPOINTS = window.__PRE_LOADCHOKEPOINTS__ || [];
+if(window.__PRE_LOADCHOKEPOINTS__) {
+  console.log('Found preloaded chokepoints');
+} else {
+  console.error('Not found preloaded chokepoints');
+}
+
 let SHOW_ONLY_SUBSCRIBED = false;
 
 /*************************************************
