@@ -7,7 +7,7 @@ const STORAGE_KEY = "subscribed_areas";
 const MAX_AREA_SUBSCRIPTIONS = 2;
 
 /*************************************************
- * STATE  (🔥 SSR DATA)
+ * STATE (🔥 SSR PRELOADED)
  *************************************************/
 let ALL_CHOKEPOINTS =
   window.__PRE_LOADCHOKEPOINTS__ || [];
@@ -30,6 +30,41 @@ function saveSubscriptions(list) {
 }
 
 /*************************************************
+ * ENV CHECKS
+ *************************************************/
+const ua = navigator.userAgent.toLowerCase();
+const isIOS = /iphone|ipad|ipod/.test(ua);
+const isPWA =
+  window.matchMedia("(display-mode: standalone)").matches ||
+  navigator.standalone === true;
+const isFacebookBrowser = ua.includes("fban") || ua.includes("fbav");
+const isInstagramBrowser = ua.includes("instagram");
+
+/*************************************************
+ * TOAST
+ *************************************************/
+function showToast(message) {
+  const t = document.createElement("div");
+  t.textContent = message;
+  t.style = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #111;
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    z-index: 99999;
+    text-align: center;
+    max-width: 90%;
+  `;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3200);
+}
+
+/*************************************************
  * GOOGLE MAPS
  *************************************************/
 function getGoogleMapsUrl(lat, lng, name) {
@@ -38,15 +73,74 @@ function getGoogleMapsUrl(lat, lng, name) {
 }
 
 /*************************************************
- * GROUP BY AREA
+ * ONESIGNAL INIT
  *************************************************/
-function groupByArea(list) {
-  return list.reduce((acc, cp) => {
-    const key = cp.area.toLowerCase().replace(/\s+/g, "_");
-    acc[key] = acc[key] || { name: cp.area, items: [] };
-    acc[key].items.push(cp);
-    return acc;
-  }, {});
+let oneSignalResolve;
+const oneSignalReady = new Promise(r => (oneSignalResolve = r));
+
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+window.OneSignalDeferred.push(async function (OneSignal) {
+  await OneSignal.init({
+    appId: "a0be9561-f1b6-4f22-a214-e8b6412f28b3",
+    notifyButton: { enable: false }
+  });
+  oneSignalResolve(OneSignal);
+});
+
+/*************************************************
+ * AREA SUBSCRIBE / UNSUBSCRIBE
+ *************************************************/
+async function toggleAreaSubscription(areaKey) {
+  if (isFacebookBrowser || isInstagramBrowser) {
+    showToast(
+      isIOS
+        ? "⚠️ Open in Safari → Add to Home Screen"
+        : "⚠️ Open in Chrome (in-app browser unsupported)"
+    );
+    return;
+  }
+
+  if (isIOS && !isPWA) {
+    showToast("📱 Add to Home Screen required for iOS alerts");
+    return;
+  }
+
+  const subs = getSubscriptions();
+  const isSub = subs.includes(areaKey);
+
+  if (!isSub && subs.length >= MAX_AREA_SUBSCRIPTIONS) {
+    showToast(
+      "🚦 You can subscribe to alerts for only 2 areas. Unsubscribe from one area to add another."
+    );
+    return;
+  }
+
+  const OneSignal = await oneSignalReady;
+  const permission = await OneSignal.Notifications.requestPermission();
+  if (!permission) {
+    showToast("🔕 Notifications blocked");
+    return;
+  }
+
+  await OneSignal.User.PushSubscription.optIn();
+
+  try {
+    if (isSub) {
+      await OneSignal.User.removeTag(`area_${areaKey}`);
+    } else {
+      await OneSignal.User.addTag(`area_${areaKey}`, "1");
+    }
+
+    saveSubscriptions(
+      isSub ? subs.filter(a => a !== areaKey) : [...subs, areaKey]
+    );
+
+    showToast(isSub ? "🔕 Area alerts disabled" : "🔔 Area alerts enabled");
+    render();
+  } catch (err) {
+    console.error(err);
+    showToast("⚠️ Failed to update alerts");
+  }
 }
 
 /*************************************************
@@ -54,6 +148,7 @@ function groupByArea(list) {
  *************************************************/
 function formatCheckedAt(checkedAt) {
   if (!checkedAt) return "Unknown";
+
   const t = new Date(checkedAt);
   const diffMin = Math.floor((Date.now() - t) / 60000);
 
@@ -69,6 +164,18 @@ function formatCheckedAt(checkedAt) {
     hour: "2-digit",
     minute: "2-digit"
   });
+}
+
+/*************************************************
+ * GROUP BY AREA
+ *************************************************/
+function groupByArea(list) {
+  return list.reduce((acc, cp) => {
+    const key = cp.area.toLowerCase().replace(/\s+/g, "_");
+    acc[key] = acc[key] || { name: cp.area, items: [] };
+    acc[key].items.push(cp);
+    return acc;
+  }, {});
 }
 
 /*************************************************
@@ -104,8 +211,8 @@ function render() {
       <div class="chokepoint-list"></div>
     `;
 
-    const btn = areaCard.querySelector("button");
-    btn.onclick = () => toggleAreaSubscription(areaKey);
+    areaCard.querySelector("button").onclick =
+      () => toggleAreaSubscription(areaKey);
 
     const list = areaCard.querySelector(".chokepoint-list");
 
@@ -136,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /*************************************************
- * BACKGROUND REFRESH
+ * BACKGROUND REFRESH (OPTIONAL)
  *************************************************/
 async function refreshChokepoints() {
   try {
