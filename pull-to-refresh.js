@@ -35,8 +35,8 @@
       indicator.textContent = "⏳ Refreshing traffic…";
 
       try {
-        if (typeof window.load === "function") {
-          await window.load(); // 🔥 invoke app.js
+        if (typeof window.refreshChokepoints === "function") {
+          await window.refreshChokepoints(); // 🔥 invoke app.js
         } else {
           console.error("Pull-to-refresh: load() not found");
         }
