@@ -7,14 +7,10 @@ const STORAGE_KEY = "subscribed_areas";
 const MAX_AREA_SUBSCRIPTIONS = 2;
 
 /*************************************************
- * STATE
+ * STATE  (🔥 SSR DATA)
  *************************************************/
-let ALL_CHOKEPOINTS = [];
-if(window.__PRE_LOADCHOKEPOINTS__) {
-  console.log('Found preloaded chokepoints');
-} else {
-  console.error('Not found preloaded chokepoints');
-}
+let ALL_CHOKEPOINTS =
+  window.__PRE_LOADCHOKEPOINTS__ || [];
 
 let SHOW_ONLY_SUBSCRIBED = false;
 
@@ -34,41 +30,6 @@ function saveSubscriptions(list) {
 }
 
 /*************************************************
- * ENV CHECKS
- *************************************************/
-const ua = navigator.userAgent.toLowerCase();
-const isIOS = /iphone|ipad|ipod/.test(ua);
-const isPWA =
-  window.matchMedia("(display-mode: standalone)").matches ||
-  navigator.standalone === true;
-const isFacebookBrowser = ua.includes("fban") || ua.includes("fbav");
-const isInstagramBrowser = ua.includes("instagram");
-
-/*************************************************
- * TOAST
- *************************************************/
-function showToast(message) {
-  const t = document.createElement("div");
-  t.textContent = message;
-  t.style = `
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #111;
-    color: #fff;
-    padding: 12px 18px;
-    border-radius: 10px;
-    font-size: 14px;
-    z-index: 99999;
-    text-align: center;
-    max-width: 90%;
-  `;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3200);
-}
-
-/*************************************************
  * GOOGLE MAPS
  *************************************************/
 function getGoogleMapsUrl(lat, lng, name) {
@@ -77,74 +38,15 @@ function getGoogleMapsUrl(lat, lng, name) {
 }
 
 /*************************************************
- * ONESIGNAL INIT
+ * GROUP BY AREA
  *************************************************/
-let oneSignalResolve;
-const oneSignalReady = new Promise(r => (oneSignalResolve = r));
-
-window.OneSignalDeferred = window.OneSignalDeferred || [];
-window.OneSignalDeferred.push(async function (OneSignal) {
-  await OneSignal.init({
-    appId: "a0be9561-f1b6-4f22-a214-e8b6412f28b3",
-    notifyButton: { enable: false }
-  });
-  oneSignalResolve(OneSignal);
-});
-
-/*************************************************
- * AREA SUBSCRIBE / UNSUBSCRIBE
- *************************************************/
-async function toggleAreaSubscription(areaKey) {
-  if (isFacebookBrowser || isInstagramBrowser) {
-    showToast(
-      isIOS
-        ? "⚠️ Open in Safari → Add to Home Screen"
-        : "⚠️ Open in Chrome (in-app browser unsupported)"
-    );
-    return;
-  }
-
-  if (isIOS && !isPWA) {
-    showToast("📱 Add to Home Screen required for iOS alerts");
-    return;
-  }
-
-  const subs = getSubscriptions();
-  const isSub = subs.includes(areaKey);
-
-  if (!isSub && subs.length >= MAX_AREA_SUBSCRIPTIONS) {
-    showToast(
-      "🚦 You can subscribe to alerts for only 2 areas. Unsubscribe from one area to add another."
-    );
-    return;
-  }
-
-  const OneSignal = await oneSignalReady;
-  const permission = await OneSignal.Notifications.requestPermission();
-  if (!permission) {
-    showToast("🔕 Notifications blocked");
-    return;
-  }
-
-  await OneSignal.User.PushSubscription.optIn();
-
-  try {
-    if (isSub) {
-      await OneSignal.User.removeTag(`area_${areaKey}`);
-    } else {
-      await OneSignal.User.addTag(`area_${areaKey}`, "1");
-    }
-
-    saveSubscriptions(
-      isSub ? subs.filter(a => a !== areaKey) : [...subs, areaKey]
-    );
-
-    showToast(isSub ? "🔕 Area alerts disabled" : "🔔 Area alerts enabled");
-    render();
-  } catch (err) {
-    console.error(err);
-    showToast("⚠️ Failed to update alerts");
-  }
+function groupByArea(list) {
+  return list.reduce((acc, cp) => {
+    const key = cp.area.toLowerCase().replace(/\s+/g, "_");
+    acc[key] = acc[key] || { name: cp.area, items: [] };
+    acc[key].items.push(cp);
+    return acc;
+  }, {});
 }
 
 /*************************************************
@@ -152,7 +54,6 @@ async function toggleAreaSubscription(areaKey) {
  *************************************************/
 function formatCheckedAt(checkedAt) {
   if (!checkedAt) return "Unknown";
-
   const t = new Date(checkedAt);
   const diffMin = Math.floor((Date.now() - t) / 60000);
 
@@ -168,18 +69,6 @@ function formatCheckedAt(checkedAt) {
     hour: "2-digit",
     minute: "2-digit"
   });
-}
-
-/*************************************************
- * GROUP BY AREA
- *************************************************/
-function groupByArea(list) {
-  return list.reduce((acc, cp) => {
-    const key = cp.area.toLowerCase().replace(/\s+/g, "_");
-    acc[key] = acc[key] || { name: cp.area, items: [] };
-    acc[key].items.push(cp);
-    return acc;
-  }, {});
 }
 
 /*************************************************
@@ -202,7 +91,6 @@ function render() {
 
   sortedAreas.forEach(([areaKey, area]) => {
     const isSub = subs.includes(areaKey);
-    if (SHOW_ONLY_SUBSCRIBED && !isSub) return;
 
     const areaCard = document.createElement("div");
     areaCard.className = "area-card";
@@ -216,8 +104,8 @@ function render() {
       <div class="chokepoint-list"></div>
     `;
 
-    areaCard.querySelector("button").onclick =
-      () => toggleAreaSubscription(areaKey);
+    const btn = areaCard.querySelector("button");
+    btn.onclick = () => toggleAreaSubscription(areaKey);
 
     const list = areaCard.querySelector(".chokepoint-list");
 
@@ -238,34 +126,17 @@ function render() {
 
     grid.appendChild(areaCard);
   });
-
-  if (!grid.children.length) {
-    grid.innerHTML = `
-      <p class="no_chokepoints">
-        Subscribe to up to ${MAX_AREA_SUBSCRIPTIONS} areas to receive live traffic alerts.
-      </p>
-    `;
-  }
-
-  if (subs.length > 0) {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
 }
 
 /*************************************************
- * INITIAL LOAD
+ * INITIAL LOAD (🔥 NO FETCH)
  *************************************************/
 document.addEventListener("DOMContentLoaded", () => {
-  if (ALL_CHOKEPOINTS.length) {
-    // First load: render preloaded data
-    render();
-  } else {
-    refreshChokepoints()
-  }
+  render();
 });
 
 /*************************************************
- * OPTIONAL BACKGROUND REFRESH (every 10 min)
+ * BACKGROUND REFRESH
  *************************************************/
 async function refreshChokepoints() {
   try {
@@ -276,37 +147,5 @@ async function refreshChokepoints() {
     console.error("Failed to refresh chokepoints", err);
   }
 }
-
-// Uncomment if you want live refresh
-// setInterval(refreshChokepoints, 10 * 60 * 1000);
-
-/*************************************************
- * NATIVE SHARE BUTTON
- *************************************************/
-document.addEventListener("DOMContentLoaded", () => {
-  const shareBtn = document.getElementById("nativeShareBtn");
-  if (!shareBtn) return;
-
-  shareBtn.addEventListener("click", async () => {
-    const shareData = {
-      title: "Pune Traffic Alerts",
-      text: "Automatic Pune traffic alerts. Updated every 10 minutes.",
-      url: window.location.origin
-    };
-
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(
-          `${shareData.text}\n${shareData.url}`
-        );
-        alert("Link copied to clipboard");
-      }
-    } catch (err) {
-      console.error("Share failed", err);
-    }
-  });
-});
 
 window.refreshChokepoints = refreshChokepoints;
