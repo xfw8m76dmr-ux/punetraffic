@@ -74,7 +74,7 @@ function renderChokepoint(cp) {
 
   return `
     <div class="chokepoint ${status}">
-      <div class="cp-name">${cp.name}</div>
+      <h2 class="cp-name">${cp.name}</h2>
       <div class="cp-status">${label}</div>
       <div class="cp-time">Last checked: ${checkedAt}</div>
       <a href="${mapUrl}" target="_blank" class="map-link">📍</a>
@@ -296,6 +296,7 @@ main {
 .cp-name {
   font-weight: 600;
   font-size: .95rem;
+  margin: 0px;
 }
 
 .cp-status {
