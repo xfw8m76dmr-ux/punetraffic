@@ -250,8 +250,9 @@ main {
 }
 
 .subscribe-btn:not(.subscribed) {
-  background: #16a34a;
+  background: darkgreen;
   color: white;
+  font-weight: bold;
 }
 
 .subscribe-btn.subscribed {
