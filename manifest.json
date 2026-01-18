@@ -2,7 +2,7 @@
   "name": "Pune Traffic Alerts",
   "short_name": "Pune Traffic",
   "description": "Automatic Pune traffic alerts during daytime. Notifies you only when traffic gets jammed.",
-  "start_url": "https://www.punetraffic.com/",
+  "start_url": "https://punetraffic.com/",
   "display": "standalone",
   "background_color": "#111827",
   "theme_color": "#111827",
