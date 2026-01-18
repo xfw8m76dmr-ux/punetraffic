@@ -1,129 +1,159 @@
-<!DOCTYPE html>
+export async function onRequest(context) {
+  const { request } = context;
+  const url = new URL(request.url);
+
+  // Only SSR homepage
+  if (url.pathname !== "/") {
+    return context.next();
+  }
+
+  // Fetch data on EDGE
+  const res = await fetch(
+    "https://trafficmatrix.k7jzqg8c4k.workers.dev/api/chokepoints",
+    { cf: { cacheTtl: 300, cacheEverything: true } }
+  );
+
+  const chokepoints = await res.json();
+
+  const renderedGrid = renderGrid(chokepoints);
+
+  const html = getHtml({
+    chokepoints,
+    renderedGrid
+  });
+
+  return new Response(html, {
+    headers: {
+      "Content-Type": "text/html",
+      "Cache-Control": "public, max-age=60, stale-while-revalidate=300"
+    }
+  });
+}
+
+/*************************************************
+ * SERVER RENDER HELPERS
+ *************************************************/
+
+function groupByArea(list) {
+  return list.reduce((acc, cp) => {
+    const key = cp.area.toLowerCase().replace(/\s+/g, "_");
+    acc[key] ??= { name: cp.area, items: [] };
+    acc[key].items.push(cp);
+    return acc;
+  }, {});
+}
+
+function renderGrid(chokepoints) {
+  const grouped = groupByArea(chokepoints);
+
+  return Object.values(grouped)
+    .map(area => `
+      <div class="area-card">
+        <div class="area-header">
+          <h2>${area.name}</h2>
+          <button class="subscribe-btn">
+            🔔 Alert me when Traffic Jams
+          </button>
+        </div>
+        <div class="chokepoint-list">
+          ${area.items.map(renderChokepoint).join("")}
+        </div>
+      </div>
+    `)
+    .join("");
+}
+
+function renderChokepoint(cp) {
+  const status = cp.traffic?.status || "LOW";
+  const label = cp.traffic?.label || "Unknown";
+  const checkedAt = cp.traffic?.checkedAt
+    ? new Date(cp.traffic.checkedAt).toLocaleString("en-IN")
+    : "Unknown";
+
+  const mapUrl = `https://www.google.com/maps?q=${cp.lat},${cp.lng}`;
+
+  return `
+    <div class="chokepoint ${status}">
+      <div class="cp-name">${cp.name}</div>
+      <div class="cp-status">${label}</div>
+      <div class="cp-time">Last checked: ${checkedAt}</div>
+      <a href="${mapUrl}" target="_blank" class="map-link">📍</a>
+    </div>
+  `;
+}
+
+function getHtml({ chokepoints, renderedGrid }) {
+return `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+<meta charset="UTF-8" />
 
-  <!-- Favicons -->
-  <link rel="apple-touch-icon" href="/icons/icon-192.png">
-  <link rel="icon" href="/icons/icon-512.png" sizes="512x512" type="image/png">
-  <link rel="icon" href="/icons/icon-192.png" sizes="192x192" type="image/png">
+<!-- Favicons -->
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="icon" href="/icons/icon-512.png" sizes="512x512" type="image/png">
+<link rel="icon" href="/icons/icon-192.png" sizes="192x192" type="image/png">
 
-  <!-- PWA -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#111827">
+<!-- PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#111827">
 
-  <!-- PRIMARY SEO -->
-  <title>Pune Traffic Today – Live Traffic Status, Congestion & Alerts</title>
-  <meta
-    name="description"
-    content="Check Pune traffic today with live traffic status, congestion updates, and real-time chokepoint alerts. Pune traffic is monitored every 10 minutes during daytime. No login required."
-  />
-  <meta
-    name="keywords"
-    content="pune traffic, pune traffic today, live pune traffic, pune traffic status, pune traffic updates, real time traffic pune"
-  />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- SEO -->
+<title>Pune Traffic Today – Live Traffic Status, Congestion & Alerts</title>
+<meta name="description" content="Check Pune traffic today with live traffic status, congestion updates, and real-time chokepoint alerts. Pune traffic is monitored every 10 minutes during daytime. No login required." />
+<meta name="keywords" content="pune traffic, pune traffic today, live pune traffic, pune traffic status, pune traffic updates, real time traffic pune" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="canonical" href="https://www.punetraffic.com/" />
 
-  <!-- Canonical -->
-  <link rel="canonical" href="https://www.punetraffic.com/" />
+<!-- OneSignal -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Pune Traffic Today – Live Traffic Status & Alerts" />
-  <meta
-    property="og:description"
-    content="Live Pune traffic status with real-time congestion alerts. Get notified automatically when Pune traffic builds up in your area."
-  />
-  <meta property="og:site_name" content="Pune Traffic Alerts" />
-  <meta property="og:url" content="https://www.punetraffic.com/" />
+<style>
+${STYLESHEET}
+</style>
+</head>
 
+<body>
 
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Pune Traffic Today" />
-  <meta
-    name="twitter:description"
-    content="Live Pune traffic updates, congestion status, and automatic alerts for major Pune roads."
-  />
+<div id="ptr-indicator">↓ Pull to refresh</div>
 
-  <!-- OneSignal -->
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<header>
+  <h1>🚦 Pune Traffic – Live Status & Real-Time Alerts</h1>
+  <p>
+    We monitor Pune traffic every 10 minutes and alert you with Notification on your Mobile.
+    Daytime alerts (9 AM – 10 PM), only when traffic gets jammed.
+    No login. No signup.
+  </p>
+</header>
 
-  <!-- JSON-LD: WebSite -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Pune Traffic Alerts",
-    "url": "https://www.punetraffic.com",
-    "description": "Live Pune traffic status with real-time congestion and chokepoint alerts."
-  }
-  </script>
+<button id="quietBtn" class="quiet-btn">🔕 Set quiet hours</button>
 
-  <!-- JSON-LD: WebApplication -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Pune Traffic Alerts",
-    "applicationCategory": "NavigationApplication",
-    "operatingSystem": "All",
-    "description": "Monitors Pune traffic every 10 minutes during daytime and sends real-time alerts when congestion is detected.",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "INR"
-    }
-  }
-  </script>
+<main>
+  <div id="status"></div>
+  <div id="grid" class="grid">
+    ${renderedGrid}
+  </div>
+</main>
 
-  <!-- JSON-LD: FAQ -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "Is Pune traffic live on this website?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes. Pune traffic is monitored live and updated every 10 minutes during daytime hours."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Does this site show Pune traffic today?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes. This website shows Pune traffic today with real-time congestion and chokepoint updates."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "How often is Pune traffic updated?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Pune traffic is updated every 10 minutes between 9 AM and 10 PM."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Do I need to sign up to check Pune traffic?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "No. No signup or login is required to view Pune traffic or receive alerts."
-        }
-      }
-    ]
-  }
-  </script>
-  
+<footer>
+  Live Pune traffic monitoring • Real-time congestion alerts • Area-based Pune traffic notifications
+</footer>
 
-  <style>
-/*************************************************
+<!-- 🔥 PRELOADED DATA -->
+<script>
+window.__PRE_LOADCHOKEPOINTS__ = ${JSON.stringify(chokepoints)};
+</script>
+
+<script src="/app.js" defer></script>
+<script src="/pull-to-refresh.js" defer></script>
+<script src="/quiet-hours.js" defer></script>
+
+</body>
+</html>`;
+}
+
+const STYLESHEET = `/*************************************************
  * BASE
  *************************************************/
 body {
@@ -466,63 +496,4 @@ footer {
   font-size: 14px;
   cursor: pointer;
 }
-</style>
-</head>
-
-<body>
-
-<div id="ptr-indicator">↓ Pull to refresh</div>
-<a href="/" style="display:none">Pune traffic today</a>
-
-<header>
-  <h1>🚦 Pune Traffic – Live Status & Real-Time Alerts</h1>
-  <p>
-    We monitor Pune traffic every 10 minutes and alert you with Notification on your Mobile.
-    Daytime alerts (9 AM – 10 PM), only when traffic gets jammed.
-    No login. No signup.
-  </p>
-</header>
-
-<button id="quietBtn" class="quiet-btn">
-  🔕 Set quiet hours
-</button>
-
-<main>
-  <div id="status"></div>
-  <div id="grid" class="grid"></div>
-</main>
-
-<footer>
-  Live Pune traffic monitoring • Real-time congestion alerts • Area-based Pune traffic notifications
-</footer>
-
-<script src="app.js"></script>
-<script src="pull-to-refresh.js"></script>
-
-  
-  <section class="seo-intro">
-  <p>
-    Pune traffic can change quickly due to office rush, road work, accidents,
-    and weather. Pune Traffic Alerts shows live Pune traffic status,
-    congestion levels, and real-time chokepoints across major Pune roads.
-    Enable alerts to stay ahead of traffic before you start your journey.
-  </p>
-</section>
-
-  <div id="quietModal">
-  <div class="box">
-    <h3>🔕 Quiet hours</h3>
-
-    <div class="row">
-      <select id="quietStart"></select>
-      <select id="quietEnd"></select>
-    </div>
-
-    <button id="saveQuiet">Save</button>
-  </div>
-</div>
-
-<script src="quiet-hours.js"></script>
-  
-</body>
-</html>
+`

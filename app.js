@@ -7,14 +7,10 @@ const STORAGE_KEY = "subscribed_areas";
 const MAX_AREA_SUBSCRIPTIONS = 2;
 
 /*************************************************
- * STATE
+ * STATE (🔥 SSR PRELOADED)
  *************************************************/
-let ALL_CHOKEPOINTS = [];
-if(window.__PRE_LOADCHOKEPOINTS__) {
-  console.log('Found preloaded chokepoints');
-} else {
-  console.error('Not found preloaded chokepoints');
-}
+let ALL_CHOKEPOINTS =
+  window.__PRE_LOADCHOKEPOINTS__ || [];
 
 let SHOW_ONLY_SUBSCRIBED = false;
 
@@ -202,7 +198,6 @@ function render() {
 
   sortedAreas.forEach(([areaKey, area]) => {
     const isSub = subs.includes(areaKey);
-    if (SHOW_ONLY_SUBSCRIBED && !isSub) return;
 
     const areaCard = document.createElement("div");
     areaCard.className = "area-card";
@@ -238,34 +233,17 @@ function render() {
 
     grid.appendChild(areaCard);
   });
-
-  if (!grid.children.length) {
-    grid.innerHTML = `
-      <p class="no_chokepoints">
-        Subscribe to up to ${MAX_AREA_SUBSCRIPTIONS} areas to receive live traffic alerts.
-      </p>
-    `;
-  }
-
-  if (subs.length > 0) {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
 }
 
 /*************************************************
- * INITIAL LOAD
+ * INITIAL LOAD (🔥 NO FETCH)
  *************************************************/
 document.addEventListener("DOMContentLoaded", () => {
-  if (ALL_CHOKEPOINTS.length) {
-    // First load: render preloaded data
-    render();
-  } else {
-    refreshChokepoints()
-  }
+  render();
 });
 
 /*************************************************
- * OPTIONAL BACKGROUND REFRESH (every 10 min)
+ * BACKGROUND REFRESH (OPTIONAL)
  *************************************************/
 async function refreshChokepoints() {
   try {
@@ -276,37 +254,5 @@ async function refreshChokepoints() {
     console.error("Failed to refresh chokepoints", err);
   }
 }
-
-// Uncomment if you want live refresh
-// setInterval(refreshChokepoints, 10 * 60 * 1000);
-
-/*************************************************
- * NATIVE SHARE BUTTON
- *************************************************/
-document.addEventListener("DOMContentLoaded", () => {
-  const shareBtn = document.getElementById("nativeShareBtn");
-  if (!shareBtn) return;
-
-  shareBtn.addEventListener("click", async () => {
-    const shareData = {
-      title: "Pune Traffic Alerts",
-      text: "Automatic Pune traffic alerts. Updated every 10 minutes.",
-      url: window.location.origin
-    };
-
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(
-          `${shareData.text}\n${shareData.url}`
-        );
-        alert("Link copied to clipboard");
-      }
-    } catch (err) {
-      console.error("Share failed", err);
-    }
-  });
-});
 
 window.refreshChokepoints = refreshChokepoints;
