@@ -255,4 +255,31 @@ async function refreshChokepoints() {
   }
 }
 
+(function () {
+  const btn = document.getElementById("floatingShareBtn");
+  if (!btn) return;
+
+  btn.addEventListener("click", async () => {
+    const shareData = {
+      title: "Pune Traffic – Live Status",
+      text: "Live Pune traffic updates with real-time alerts. Updated every 10 minutes.",
+      url: window.location.href
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        alert("Link copied to clipboard");
+      }
+    } catch (e) {
+      // user cancelled share → ignore
+    }
+  });
+})();
+
+
+
+
 window.refreshChokepoints = refreshChokepoints;
