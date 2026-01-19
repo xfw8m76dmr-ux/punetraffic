@@ -167,6 +167,7 @@ body {
 .message {
  margin-left: 4px;
  margin-right: 4px;
+ text-align: center;
 }
 
 header {
