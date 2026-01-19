@@ -146,6 +146,11 @@ ${STYLESHEET}
 window.__PRE_LOADCHOKEPOINTS__ = ${JSON.stringify(chokepoints)};
 </script>
 
+<!-- Floating Share Button -->
+<button id="floatingShareBtn" class="floating-share-btn" aria-label="Share Pune Traffic">
+  🔗
+</button>
+
 <script src="/app.js" defer></script>
 <script src="/pull-to-refresh.js" defer></script>
 <script src="/quiet-hours.js" defer></script>
@@ -504,5 +509,37 @@ footer {
   color: white;
   font-size: 14px;
   cursor: pointer;
+}
+
+/*************************************************
+ * FLOATING SHARE BUTTON
+ *************************************************/
+.floating-share-btn {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: #111827;
+  color: #ffffff;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .15s ease, opacity .15s ease;
+}
+
+.floating-share-btn:hover {
+  transform: scale(1.05);
+}
+
+.floating-share-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 `
