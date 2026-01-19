@@ -126,7 +126,7 @@ ${STYLESHEET}
     No login. No signup.
   </p>
 </header>
-<p>Traffic status reflects actual travel delay; brief signal slowdowns are normal. Live updates pause at night and use last available data.</p>
+<p class="message">Traffic status reflects actual travel delay; brief signal slowdowns are normal. Live updates pause at night and use last available data.</p>
 
 <button id="quietBtn" class="quiet-btn">🔕 Set quiet hours</button>
 
@@ -162,6 +162,11 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont;
   background: #f5f7fa;
   color: #111;
+}
+
+.message {
+ margin-left: 4px;
+ margin-right: 4px;
 }
 
 header {
