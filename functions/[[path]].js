@@ -148,7 +148,7 @@ window.__PRE_LOADCHOKEPOINTS__ = ${JSON.stringify(chokepoints)};
 
 <!-- Floating Share Button -->
 <button id="floatingShareBtn" class="floating-share-btn" aria-label="Share Pune Traffic">
-  🔗
+  📤
 </button>
 
 <script src="/app.js" defer></script>
