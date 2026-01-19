@@ -126,6 +126,7 @@ ${STYLESHEET}
     No login. No signup.
   </p>
 </header>
+<p>Traffic status reflects actual travel delay; brief signal slowdowns are normal. Live updates pause at night and use last available data.</p>
 
 <button id="quietBtn" class="quiet-btn">🔕 Set quiet hours</button>
 
