@@ -263,7 +263,7 @@ async function refreshChokepoints() {
     const shareData = {
       title: "Pune Traffic – Live Status",
       text: "Live Pune traffic updates with real-time alerts. Updated every 10 minutes.",
-      url: window.location.href
+      url: "https://punetraffic.com"
     };
 
     try {
