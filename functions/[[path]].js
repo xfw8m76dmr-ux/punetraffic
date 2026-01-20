@@ -122,7 +122,7 @@ ${STYLESHEET}
   <h1>🚦 Pune Traffic – Live Status & Real-Time Alerts</h1>
   <p>
     We monitor Pune traffic every 10 minutes and alert you with Notification on your Mobile.
-    Daytime alerts (9 AM – 10 PM), only when traffic gets jammed.
+    Daytime alerts (9 AM – 6 PM), only when traffic gets jammed.
     No login. No signup.
   </p>
 </header>
