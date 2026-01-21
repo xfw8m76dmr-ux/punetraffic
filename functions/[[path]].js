@@ -452,6 +452,8 @@ footer {
 
 .refresh-btn {
   display: table;
+  margin-left: auto;
+  margin-right: auto;
   padding: 7px 14px;
   font-size: 13px;
   border-radius: 999px;
