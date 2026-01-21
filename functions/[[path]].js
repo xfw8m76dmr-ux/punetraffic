@@ -129,7 +129,7 @@ ${STYLESHEET}
 <p class="message">Traffic status reflects actual travel delay; brief signal slowdowns are normal</p>
 
 <button id="quietBtn" class="quiet-btn">🔕 Set quiet hours</button>
-
+<button id="refreshBtn" class="refresh-btn">Refresh ⟳</button>
 <main>
   <div id="status"></div>
   <div id="grid" class="grid">
@@ -439,6 +439,18 @@ footer {
  *************************************************/
 .quiet-btn {
   display: none; /* hidden initially */
+  margin: 12px auto 0;
+  padding: 7px 14px;
+  font-size: 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: #020617; /* dark slate */
+  color: #e5e7eb;
+  cursor: pointer;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.refresh-btn {
   margin: 12px auto 0;
   padding: 7px 14px;
   font-size: 13px;
