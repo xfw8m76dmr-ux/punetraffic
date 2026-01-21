@@ -281,5 +281,10 @@ async function refreshChokepoints() {
 
 
 
+const refreshButton = document.getElementById("refreshBtn");
+refreshButton.addEventListener("click", async () => {
+  refreshChokepoints()
+})
+
 
 window.refreshChokepoints = refreshChokepoints;
