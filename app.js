@@ -55,7 +55,7 @@ function showToast(message) {
     color: #fff;
     padding: 12px 18px;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: 16px;
     z-index: 99999;
     text-align: center;
     max-width: 90%;
@@ -250,6 +250,7 @@ async function refreshChokepoints() {
     const res = await fetch(`${API_URL}?_ts=${Date.now()}`, { cache: "no-store" });
     ALL_CHOKEPOINTS = await res.json();
     render();
+    showToast("You’re seeing the latest traffic. Updates run every 10 minutes till 6 PM.")
   } catch (err) {
     console.error("Failed to refresh chokepoints", err);
   }
