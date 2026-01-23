@@ -158,6 +158,7 @@ window.__PRE_LOADCHOKEPOINTS__ = ${JSON.stringify(chokepoints)};
 <script src="/app.js" defer></script>
 <script src="/pull-to-refresh.js" defer></script>
 <script src="/quiet-hours.js" defer></script>
+<script src="/utils.js" defer></script>
 
 </body>
 </html>`;
