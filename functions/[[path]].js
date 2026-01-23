@@ -302,9 +302,9 @@ main {
 
 .chokepoint.LOW { border-left-color: #16a34a; }
 .chokepoint.MEDIUM,
-.chokepoint.MODERATE { border-left-color: #d97706; }
+.chokepoint.MODERATE { border-left-color: orangered; }
 .chokepoint.HIGH,
-.chokepoint.CRITICAL { border-left-color: #dc2626; }
+.chokepoint.CRITICAL { border-left-color: darkred; }
 
 /*************************************************
  * CHOKEPOINT TEXT
@@ -322,9 +322,9 @@ main {
 
 .chokepoint.LOW .cp-status { color: darkgreen; }
 .chokepoint.MEDIUM .cp-status,
-.chokepoint.MODERATE .cp-status { color: #d97706; }
+.chokepoint.MODERATE .cp-status { color: orangered; }
 .chokepoint.HIGH .cp-status,
-.chokepoint.CRITICAL .cp-status { color: #dc2626; }
+.chokepoint.CRITICAL .cp-status { color: darkred; }
 
 .cp-time {
   font-size: .75rem;
