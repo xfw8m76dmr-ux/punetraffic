@@ -107,6 +107,10 @@ return `<!DOCTYPE html>
 <link rel="canonical" href="https://www.punetraffic.com/" />
 
 <!-- OneSignal -->
+<link rel="preconnect" href="https://cdn.onesignal.com">
+<link rel="preconnect" href="https://api.onesignal.com">
+<link rel="dns-prefetch" href="https://cdn.onesignal.com">
+<link rel="dns-prefetch" href="https://api.onesignal.com">
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
 <style>
