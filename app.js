@@ -82,7 +82,16 @@ window.OneSignalDeferred = window.OneSignalDeferred || [];
 window.OneSignalDeferred.push(async function (OneSignal) {
   await OneSignal.init({
     appId: "a0be9561-f1b6-4f22-a214-e8b6412f28b3",
-    notifyButton: { enable: false }
+    // 1. Completely disable the built-in UI
+    notifyButton: { enable: false },
+    // 2. Disable the Slide Prompt logic entirely
+    promptOptions: {
+      slidedown: { enabled: false }
+    },
+    // 3. Stop the "Welcome" notification to save a network request
+    welcomeNotification: { disable: true },
+    // 4. Optimization: prevents injecting CSS into the DOM
+    allowLocalStyleOverride: true
   });
   oneSignalResolve(OneSignal);
 });
