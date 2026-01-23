@@ -1,27 +1,32 @@
 // set source as PWA
+// PWA source attribution (URL-based, Zaraz-safe)
 (function () {
   try {
-    if (sessionStorage.getItem('pwa_attributed')) return;
-
-    // Detect PWA / standalone
-    var isPWA =
-      window.matchMedia('(display-mode: standalone)').matches ||
-      window.navigator.standalone === true;
-
-    if (!isPWA) return;
+    // Do not override existing UTMs
     if (location.search.includes('utm_source=')) return;
 
     // Detect platform
     var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    var platform = isIOS ? 'ios' : 'chrome';
 
+    // Detect PWA / standalone mode
+    var isPWA = isIOS
+      ? navigator.standalone === true
+      : window.matchMedia('(display-mode: standalone)').matches;
+
+    if (!isPWA) return;
+
+    // Platform for campaign
+    var platform = 'desktop';
+    if (isIOS) platform = 'ios';
+    else if (/android/i.test(navigator.userAgent)) platform = 'android';
+
+    // Append UTMs
     var url = new URL(window.location.href);
     url.searchParams.set('utm_source', 'pwa');
     url.searchParams.set('utm_medium', 'app');
-    url.searchParams.set('utm_campaign', platform); // chrome | ios
+    url.searchParams.set('utm_campaign', platform);
 
+    // Update URL without reload
     window.history.replaceState({}, '', url.toString());
-
-    sessionStorage.setItem('pwa_attributed', '1');
   } catch (e) {}
 })();
