@@ -118,7 +118,7 @@ async function toggleAreaSubscription(areaKey) {
   const OneSignal = await oneSignalReady;
   const permission = await OneSignal.Notifications.requestPermission();
   if (!permission) {
-    showToast("🔕 Notifications blocked");
+    showToast("🚦 Live alerts need a real browser. Open PuneTraffic in Chrome/Safari to continue.");
     return;
   }
 
