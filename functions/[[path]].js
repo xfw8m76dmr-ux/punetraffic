@@ -330,35 +330,52 @@ main {
 /*************************************************
  * URGENT: CRITICAL STATUS STYLING
  *************************************************/
+/*************************************************
+ * HIGH & CRITICAL: FULL CARD EMPHASIS
+ *************************************************/
+
+/* Shared base for both */
+.chokepoint.HIGH, 
 .chokepoint.CRITICAL {
-  /* Override the standard left border with a full border */
-  border: 2px solid #b91c1c; /* A rich, deep red */
-  background: #fff5f5;       /* Very subtle red tint to the background */
-  animation: critical-pulse 2s infinite ease-in-out;
-  box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.4);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+/* HIGH: The "Warning" State (Deep Orange/Amber) */
+.chokepoint.HIGH {
+  border-color: #f97316; /* Vibrant Orange */
+  background: #fffaf0;   /* Subtle amber tint */
+  animation: high-pulse 3s infinite ease-in-out; /* Slower, calmer pulse */
+}
+
+/* CRITICAL: The "Emergency" State (Deep Red) */
+.chokepoint.CRITICAL {
+  border-color: #b91c1c; /* Deep Red */
+  background: #fff5f5;   /* Subtle red tint */
+  animation: critical-pulse 1.5s infinite ease-in-out; /* Faster, urgent pulse */
+}
+
+@keyframes high-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.2); }
+  50% { box-shadow: 0 0 10px 2px rgba(249, 115, 22, 0.1); }
 }
 
 @keyframes critical-pulse {
-  0% {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.4); 
     border-color: #b91c1c;
-    box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.4);
   }
-  50% {
-    /* The "glow" expands slightly and the border softens */
-    border-color: #ef4444; 
-    box-shadow: 0 0 12px 4px rgba(185, 28, 28, 0.1);
-  }
-  100% {
-    border-color: #b91c1c;
-    box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.4);
+  50% { 
+    box-shadow: 0 0 15px 5px rgba(185, 28, 28, 0.2); 
+    border-color: #ef4444; /* Brightens at peak of pulse */
   }
 }
 
-/* Ensure the text inside matches the intensity */
+/* Polish: Make the status text bold enough to match the border */
+.chokepoint.HIGH .cp-status,
 .chokepoint.CRITICAL .cp-status {
-  font-weight: 900;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 /*************************************************
