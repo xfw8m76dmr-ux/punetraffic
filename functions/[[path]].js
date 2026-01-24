@@ -327,26 +327,38 @@ main {
 .chokepoint.HIGH,
 .chokepoint.CRITICAL { border-left-color: darkred; }
 
-/* Pulsing left border for HIGH/CRITICAL traffic */
-.chokepoint.HIGH, .chokepoint.CRITICAL {
-  position: relative;
+/*************************************************
+ * URGENT: CRITICAL STATUS STYLING
+ *************************************************/
+.chokepoint.CRITICAL {
+  /* Override the standard left border with a full border */
+  border: 2px solid #b91c1c; /* A rich, deep red */
+  background: #fff5f5;       /* Very subtle red tint to the background */
+  animation: critical-pulse 2s infinite ease-in-out;
+  box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.4);
 }
 
-.chokepoint.HIGH::before, .chokepoint.CRITICAL::before {
-  content: '';
-  position: absolute;
-  left: -4px;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: inherit;
-  animation: traffic-pulse 2s infinite;
+@keyframes critical-pulse {
+  0% {
+    border-color: #b91c1c;
+    box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.4);
+  }
+  50% {
+    /* The "glow" expands slightly and the border softens */
+    border-color: #ef4444; 
+    box-shadow: 0 0 12px 4px rgba(185, 28, 28, 0.1);
+  }
+  100% {
+    border-color: #b91c1c;
+    box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.4);
+  }
 }
 
-@keyframes traffic-pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.3; }
-  100% { opacity: 1; }
+/* Ensure the text inside matches the intensity */
+.chokepoint.CRITICAL .cp-status {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /*************************************************
