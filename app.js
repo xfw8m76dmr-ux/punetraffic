@@ -100,12 +100,9 @@ window.OneSignalDeferred.push(async function (OneSignal) {
  * AREA SUBSCRIBE / UNSUBSCRIBE
  *************************************************/
 async function toggleAreaSubscription(areaKey) {
+  // 1. Browser & Environment Guards
   if (isFacebookBrowser || isInstagramBrowser) {
-    showToast(
-      isIOS
-        ? "⚠️ Open in Safari → Add to Home Screen"
-        : "⚠️ Open in Chrome (in-app browser unsupported)"
-    );
+    showToast(isIOS ? "⚠️ Open in Safari → Add to Home Screen" : "⚠️ Open in Chrome");
     return;
   }
 
@@ -114,43 +111,103 @@ async function toggleAreaSubscription(areaKey) {
     return;
   }
 
+  // 2. State & Permission Management
   const subs = getSubscriptions();
   const isSub = subs.includes(areaKey);
 
   if (!isSub && subs.length >= MAX_AREA_SUBSCRIPTIONS) {
-    showToast(
-      "🚦 You can subscribe to alerts for only 2 areas. Unsubscribe from one area to add another."
-    );
+    showToast(`🚦 Max ${MAX_AREA_SUBSCRIPTIONS} areas allowed. Unsubscribe from one first.`);
     return;
   }
 
   const OneSignal = await oneSignalReady;
   const permission = await OneSignal.Notifications.requestPermission();
   if (!permission) {
-    showToast("🚦 Live alerts need a real browser. Open PuneTraffic in Chrome/Safari to continue.");
+    showToast("🚦 Alerts disabled. Enable notifications in browser settings.");
     return;
   }
 
   await OneSignal.User.PushSubscription.optIn();
 
+  // 3. The New Tagging Logic (Clubbing)
+  const newSubs = isSub ? subs.filter(a => a !== areaKey) : [...subs, areaKey];
+  
+  // Create a searchable string: ",baner,wakad,"
+  const tagValue = newSubs.length > 0 ? `,${newSubs.join(',')},` : "";
+
   try {
-    if (isSub) {
-      await OneSignal.User.removeTag(`area_${areaKey}`);
+    if (tagValue === "") {
+      await OneSignal.User.removeTag("areas");
     } else {
-      await OneSignal.User.addTag(`area_${areaKey}`, "1");
+      await OneSignal.User.addTag("areas", tagValue);
     }
 
-    saveSubscriptions(
-      isSub ? subs.filter(a => a !== areaKey) : [...subs, areaKey]
-    );
+    // BACKWARD COMPATIBILITY: 
+    // Explicitly remove the old-style tag for THIS area to migrate the user
+    await OneSignal.User.removeTag(`area_${areaKey}`);
 
+    // Update local storage and UI
+    saveSubscriptions(newSubs);
     showToast(isSub ? "🔕 Area alerts disabled" : "🔔 Area alerts enabled");
     render();
   } catch (err) {
-    console.error(err);
+    console.error("Tagging Error:", err);
     showToast("⚠️ Failed to update alerts");
   }
 }
+
+// async function toggleAreaSubscription(areaKey) {
+//   if (isFacebookBrowser || isInstagramBrowser) {
+//     showToast(
+//       isIOS
+//         ? "⚠️ Open in Safari → Add to Home Screen"
+//         : "⚠️ Open in Chrome (in-app browser unsupported)"
+//     );
+//     return;
+//   }
+
+//   if (isIOS && !isPWA) {
+//     showToast("📱 Add to Home Screen required for iOS alerts");
+//     return;
+//   }
+
+//   const subs = getSubscriptions();
+//   const isSub = subs.includes(areaKey);
+
+//   if (!isSub && subs.length >= MAX_AREA_SUBSCRIPTIONS) {
+//     showToast(
+//       "🚦 You can subscribe to alerts for only 2 areas. Unsubscribe from one area to add another."
+//     );
+//     return;
+//   }
+
+//   const OneSignal = await oneSignalReady;
+//   const permission = await OneSignal.Notifications.requestPermission();
+//   if (!permission) {
+//     showToast("🚦 Live alerts need a real browser. Open PuneTraffic in Chrome/Safari to continue.");
+//     return;
+//   }
+
+//   await OneSignal.User.PushSubscription.optIn();
+
+//   try {
+//     if (isSub) {
+//       await OneSignal.User.removeTag(`area_${areaKey}`);
+//     } else {
+//       await OneSignal.User.addTag(`area_${areaKey}`, "1");
+//     }
+
+//     saveSubscriptions(
+//       isSub ? subs.filter(a => a !== areaKey) : [...subs, areaKey]
+//     );
+
+//     showToast(isSub ? "🔕 Area alerts disabled" : "🔔 Area alerts enabled");
+//     render();
+//   } catch (err) {
+//     console.error(err);
+//     showToast("⚠️ Failed to update alerts");
+//   }
+// }
 
 /*************************************************
  * TIME FORMAT
