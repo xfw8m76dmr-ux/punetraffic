@@ -100,62 +100,34 @@ window.OneSignalDeferred.push(async function (OneSignal) {
  * AREA SUBSCRIBE / UNSUBSCRIBE
  *************************************************/
 async function toggleAreaSubscription(areaKey) {
-  // 1. Browser & Environment Guards
-  if (isFacebookBrowser || isInstagramBrowser) {
-    showToast(isIOS ? "⚠️ Open in Safari → Add to Home Screen" : "⚠️ Open in Chrome");
-    return;
-  }
+  // ... (Keep your existing Browser/iOS/PWA checks) ...
 
-  if (isIOS && !isPWA) {
-    showToast("📱 Add to Home Screen required for iOS alerts");
-    return;
-  }
-
-  // 2. State & Permission Management
   const subs = getSubscriptions();
   const isSub = subs.includes(areaKey);
+  const newSubs = isSub ? subs.filter(a => a !== areaKey) : [...subs, areaKey];
 
-  if (!isSub && subs.length >= MAX_AREA_SUBSCRIPTIONS) {
-    showToast(`🚦 Max ${MAX_AREA_SUBSCRIPTIONS} areas allowed. Unsubscribe from one first.`);
-    return;
-  }
+  // Logic: ["south", "west"] -> "south+west"
+  const tagValue = newSubs.sort().join("+");
 
   const OneSignal = await oneSignalReady;
-  const permission = await OneSignal.Notifications.requestPermission();
-  if (!permission) {
-    showToast("🚦 Alerts disabled. Enable notifications in browser settings.");
-    return;
-  }
-
-  await OneSignal.User.PushSubscription.optIn();
-
-  // 3. The New Tagging Logic (Clubbing)
-  const newSubs = isSub ? subs.filter(a => a !== areaKey) : [...subs, areaKey];
-  
-  // Create a searchable string: ",baner,wakad,"
-  const tagValue = newSubs.length > 0 ? `,${newSubs.join(',')},` : "";
-
   try {
+    // 1. Set the new combined tag
     if (tagValue === "") {
-      await OneSignal.User.removeTag("areas");
+      await OneSignal.User.removeTag("area_set");
     } else {
-      await OneSignal.User.addTag("areas", tagValue);
+      await OneSignal.User.addTag("area_set", tagValue);
     }
 
-    // BACKWARD COMPATIBILITY: 
-    // Explicitly remove the old-style tag for THIS area to migrate the user
+    // 2. Migration: Remove the old individual tag for this area
     await OneSignal.User.removeTag(`area_${areaKey}`);
 
-    // Update local storage and UI
     saveSubscriptions(newSubs);
-    showToast(isSub ? "🔕 Area alerts disabled" : "🔔 Area alerts enabled");
+    showToast(isSub ? "🔕 Alerts disabled" : "🔔 Alerts enabled");
     render();
   } catch (err) {
-    console.error("Tagging Error:", err);
-    showToast("⚠️ Failed to update alerts");
+    showToast("⚠️ Update failed");
   }
 }
-
 // async function toggleAreaSubscription(areaKey) {
 //   if (isFacebookBrowser || isInstagramBrowser) {
 //     showToast(
