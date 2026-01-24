@@ -94,18 +94,18 @@ window.OneSignalDeferred.push(async function (OneSignal) {
 
     // We only need to sync if we have a subscription and it's not already linked
     if (subId && currentExternalId !== subId) {
-      console.log("🔗 Attempting to sync External ID...");
+      showToast("🔗 Attempting to sync External ID...");
       
       try {
         // OneSignal.login returns a promise in v16
         await OneSignal.login(subId);
         
-        console.log("✅ Identity Linked Successfully");
+        showToast("✅ Identity Linked Successfully");
         if (typeof showToast === "function") {
           showToast("OneSignal Identity Linked Successfully");
         }
       } catch (error) {
-        console.error("❌ OneSignal Login Failed:", error);
+        showToast("❌ OneSignal Login Failed:", error);
         if (typeof showToast === "function") {
           showToast("Failed to link OneSignal identity");
         }
@@ -118,7 +118,7 @@ window.OneSignalDeferred.push(async function (OneSignal) {
 
   // 2. Watch for the moment a user clicks "Allow" for the first time
   OneSignal.User.PushSubscription.addEventListener("change", (event) => {
-    console.log("🔔 Subscription state changed. Re-syncing...");
+    showToast("🔔 Subscription state changed. Re-syncing...");
     syncExternalId();
   });
   
