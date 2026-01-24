@@ -82,38 +82,50 @@ window.OneSignalDeferred = window.OneSignalDeferred || [];
 window.OneSignalDeferred.push(async function (OneSignal) {
   await OneSignal.init({
     appId: "a0be9561-f1b6-4f22-a214-e8b6412f28b3",
-    // 1. Completely disable the built-in UI
     notifyButton: { enable: false },
-    // 2. Disable the Slide Prompt logic entirely
-    promptOptions: {
-      slidedown: { enabled: false }
-    },
-    // 3. Stop the "Welcome" notification to save a network request
+    promptOptions: { slidedown: { enabled: false } },
     welcomeNotification: { disable: true },
-    // 4. Optimization: prevents injecting CSS into the DOM
     allowLocalStyleOverride: true
   });
 
-  // Function to sync ID
-  const syncExternalId = () => {
+  const syncExternalId = async () => {
     const subId = OneSignal.User.PushSubscription.id;
-    const externalId = OneSignal.User.externalId;
+    const currentExternalId = OneSignal.User.externalId;
 
-    // Only login if we have a subId and it hasn't been set as externalId yet
-    if (subId && externalId !== subId) {
-      console.log("🔗 Syncing OneSignal External ID...");
-      OneSignal.login(subId);
+    // We only need to sync if we have a subscription and it's not already linked
+    if (subId && currentExternalId !== subId) {
+      console.log("🔗 Attempting to sync External ID...");
+      
+      try {
+        // OneSignal.login returns a promise in v16
+        await OneSignal.login(subId);
+        
+        console.log("✅ Identity Linked Successfully");
+        if (typeof showToast === "function") {
+          showToast("OneSignal Identity Linked Successfully");
+        }
+      } catch (error) {
+        console.error("❌ OneSignal Login Failed:", error);
+        if (typeof showToast === "function") {
+          showToast("Failed to link OneSignal identity");
+        }
+      }
     }
   };
 
-  // Run on load
+  // 1. Run immediately on page load/init
   syncExternalId();
 
-  // Also run if the user subscribes for the first time during this session
-  OneSignal.User.PushSubscription.addEventListener("change", syncExternalId);
+  // 2. Watch for the moment a user clicks "Allow" for the first time
+  OneSignal.User.PushSubscription.addEventListener("change", (event) => {
+    console.log("🔔 Subscription state changed. Re-syncing...");
+    syncExternalId();
+  });
   
-  oneSignalResolve(OneSignal);
-  
+  // Resolve your external promise if you use one
+  if (typeof oneSignalResolve === "function") {
+    oneSignalResolve(OneSignal);
+  }
 });
 
 
