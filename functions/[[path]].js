@@ -185,9 +185,7 @@ header {
   color: #ffffff;
   padding: 16px;
   text-align: center;
-  // position: relative;
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 1000;
   backdrop-filter: blur(8px);
   background: rgba(17, 24, 39, 0.95); /* Semi-transparent */
