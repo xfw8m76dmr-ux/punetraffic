@@ -134,6 +134,21 @@ window.OneSignalDeferred.push(async function (OneSignal) {
  * AREA SUBSCRIBE / UNSUBSCRIBE
  *************************************************/
 async function toggleAreaSubscription(areaKey) {
+
+   if (isFacebookBrowser || isInstagramBrowser) {
+    showToast(
+      isIOS
+        ? "⚠️ Open in Safari → Add to Home Screen"
+        : "⚠️ Open in Chrome (in-app browser unsupported)"
+    );
+    return;
+  }
+
+  if (isIOS && !isPWA) {
+    showToast("📱 Add to Home Screen required for iOS alerts");
+    return;
+  }
+  
   // ... (Keep your existing Browser/iOS/PWA checks) ...
 
   const subs = getSubscriptions();
@@ -144,6 +159,13 @@ async function toggleAreaSubscription(areaKey) {
   const tagValue = newSubs.sort().join("+");
 
   const OneSignal = await oneSignalReady;
+
+  const permission = await OneSignal.Notifications.requestPermission();
+  if (!permission) {
+    showToast("🚦 Live alerts need a real browser. Open PuneTraffic in Chrome/Safari to continue.");
+    return;
+  }
+  
   try {
     // 1. Set the new combined tag
     if (tagValue === "") {
