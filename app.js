@@ -93,8 +93,30 @@ window.OneSignalDeferred.push(async function (OneSignal) {
     // 4. Optimization: prevents injecting CSS into the DOM
     allowLocalStyleOverride: true
   });
+
+  // Function to sync ID
+  const syncExternalId = () => {
+    const subId = OneSignal.User.PushSubscription.id;
+    const externalId = OneSignal.User.externalId;
+
+    // Only login if we have a subId and it hasn't been set as externalId yet
+    if (subId && externalId !== subId) {
+      console.log("🔗 Syncing OneSignal External ID...");
+      OneSignal.login(subId);
+    }
+  };
+
+  // Run on load
+  syncExternalId();
+
+  // Also run if the user subscribes for the first time during this session
+  OneSignal.User.PushSubscription.addEventListener("change", syncExternalId);
+  
   oneSignalResolve(OneSignal);
+  
 });
+
+
 
 /*************************************************
  * AREA SUBSCRIBE / UNSUBSCRIBE
