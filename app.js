@@ -179,7 +179,30 @@ function formatCheckedAt(checkedAt) {
  * GROUP BY AREA
  *************************************************/
 function groupByArea(list) {
-  return list.reduce((acc, cp) => {
+  // 1. Define the priority hierarchy
+  const severityOrder = {
+    'CRITICAL': 1,
+    'HIGH': 2,
+    'MODERATE': 3,
+    'MEDIUM': 3, // Grouped with Moderate
+    'LOW': 4
+  };
+
+  // 2. Sort the entire list first
+  const sortedList = [...list].sort((a, b) => {
+    // Normalize to uppercase safely
+    const statusA = a.traffic?.status?.toUpperCase();
+    const statusB = b.traffic?.status?.toUpperCase();
+  
+    // Look up priority (defaulting to 5 for any unknown/missing status)
+    const priorityA = severityOrder[statusA] || 5;
+    const priorityB = severityOrder[statusB] || 5;
+  
+    return priorityA - priorityB;
+  });
+
+  // 3. Group the already-sorted items
+  return sortedList.reduce((acc, cp) => {
     const key = cp.area.toLowerCase().replace(/\s+/g, "_");
     acc[key] = acc[key] || { name: cp.area, items: [] };
     acc[key].items.push(cp);
