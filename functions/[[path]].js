@@ -185,8 +185,14 @@ header {
   color: #ffffff;
   padding: 16px;
   text-align: center;
-  position: relative;
+  // position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  background: rgba(17, 24, 39, 0.95); /* Semi-transparent */
 }
+
 
 header h1 {
   margin: 0;
@@ -238,7 +244,17 @@ main {
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0,0,0,0.03);
 }
+
+/* Add a "Pinned" indicator to the Area Card when subscribed */
+.area-card.alert-active {
+  border: 2px solid #3b82f6;
+  background: linear-gradient(to bottom right, #ffffff, #f0f7ff);
+}
+
 
 .area-header {
   display: flex;
@@ -273,9 +289,10 @@ main {
 }
 
 .subscribe-btn.subscribed {
-  background: #ffffff;
-  color: #dc2626;
-  border: 1px solid #dc2626;
+  background: #eff6ff; /* Light blue background */
+  color: #2563eb;      /* Primary Blue */
+  border: 1px solid #bfdbfe;
+  font-weight: 600;
 }
 
 /*************************************************
@@ -299,7 +316,10 @@ main {
   grid-template-rows: auto auto auto;
   gap: 4px 10px;
   border-left: 4px solid transparent;
+
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
+
 
 .chokepoint.LOW { border-left-color: #16a34a; }
 .chokepoint.MEDIUM,
@@ -307,18 +327,45 @@ main {
 .chokepoint.HIGH,
 .chokepoint.CRITICAL { border-left-color: darkred; }
 
+/* Pulsing left border for HIGH/CRITICAL traffic */
+.chokepoint.HIGH, .chokepoint.CRITICAL {
+  position: relative;
+}
+
+.chokepoint.HIGH::before, .chokepoint.CRITICAL::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: inherit;
+  animation: traffic-pulse 2s infinite;
+}
+
+@keyframes traffic-pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
 /*************************************************
  * CHOKEPOINT TEXT
  *************************************************/
 .cp-name {
-  font-weight: 600;
-  font-size: .95rem;
-  margin: 0px;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #111827;
+  letter-spacing: -0.01em; /* Tighter for readability */
+  line-height: 1.2;
 }
 
 .cp-status {
-  font-size: .8rem;
-  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  font-weight: 800;
+  margin-top: 2px;
 }
 
 .chokepoint.LOW .cp-status { color: darkgreen; }
@@ -342,10 +389,13 @@ main {
   padding: 8px 12px;
   border-radius: 10px;
   font-size: 13px;
-  background: #e5e7eb;
   color: #111827;
   text-decoration: none;
   font-weight: 500;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .map-link:hover {
