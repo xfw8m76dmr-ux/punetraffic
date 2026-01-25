@@ -320,7 +320,7 @@ function render() {
     areaCard.className = "area-card";
     areaCard.innerHTML = `
       <div class="area-header">
-        <h2>${area.name}</h2>
+        <h2>${area.name} Pune</h2>
         <button class="subscribe-btn ${isSub ? "subscribed" : ""}">
           ${isSub ? "Stop Alerts" : "🔔 Alert me when Traffic Jams"}
         </button>
@@ -340,7 +340,7 @@ function render() {
       const item = document.createElement("div");
       item.className = `chokepoint ${cp.traffic?.status || "LOW"}`;
       item.innerHTML = `
-        <div class="cp-name">${cp.name}</div>
+        <h3 class="cp-name">${cp.name}</h3>
         <div class="cp-status">${cp.traffic?.label || "Unknown"}</div>
         <div class="cp-time">Last checked: ${lastChecked}</div>
         <a href="${mapUrl}" target="_blank" class="map-link">📍</a>
