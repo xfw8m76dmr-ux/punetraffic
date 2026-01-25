@@ -145,9 +145,27 @@ ${STYLESHEET}
   Live Pune traffic monitoring • Real-time congestion alerts • Area-based Pune traffic notifications
 </footer>
 
-<!-- 🔥 PRELOADED DATA -->
-<script>
-window.__PRE_LOADCHOKEPOINTS__ = ${JSON.stringify(chokepoints)};
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Pune Traffic Live Alerts",
+  "description": "Real-time traffic congestion monitoring for Pune city.",
+  "provider": {
+    "@type": "Organization",
+    "name": "Pune Traffic",
+    "url": "https://punetraffic.com"
+  },
+  "areaServed": "Pune, India",
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Traffic Alerts",
+    "itemListElement": [
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Live Congestion Updates" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Push Notifications for Traffic Jams" } }
+    ]
+  }
+}
 </script>
 
 <!-- Floating Share Button -->
