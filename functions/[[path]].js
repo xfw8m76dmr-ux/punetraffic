@@ -406,6 +406,7 @@ main {
   color: #111827;
   letter-spacing: -0.01em; /* Tighter for readability */
   line-height: 1.2;
+  margin: 0px;
 }
 
 .cp-status {
