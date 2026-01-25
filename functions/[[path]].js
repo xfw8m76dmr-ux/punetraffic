@@ -77,8 +77,8 @@ function renderChokepoint(cp) {
       <h3 class="cp-name">${cp.name}</h3>
       <div class="cp-status">${label}</div>
       <div class="cp-time">Last checked: ${checkedAt}</div>
-      <a href="${mapUrl}" target="_blank" class="map-link"  title="View live traffic for ${cp.name} on Google Maps" 
-       aria-label="View live traffic for ${cp.name} on Google Maps"> <span style="display:none">View ${cp.name} traffic map</span>📍</a>
+      <a href="${mapUrl}" target="_blank" class="map-link"  title="View live traffic on Google Maps" 
+       aria-label="View live traffic on Google Maps"> <span style="display:none">View traffic map</span>📍</a>
     </div>
   `;
 }
