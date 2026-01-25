@@ -74,11 +74,11 @@ function renderChokepoint(cp) {
 
   return `
     <div class="chokepoint ${status}">
-      <h2 class="cp-name">${cp.name}</h2>
+      <h3 class="cp-name">${cp.name}</h3>
       <div class="cp-status">${label}</div>
       <div class="cp-time">Last checked: ${checkedAt}</div>
       <a href="${mapUrl}" target="_blank" class="map-link"  title="View live traffic for ${cp.name} on Google Maps" 
-       aria-label="View live traffic for ${cp.name} on Google Maps">📍</a>
+       aria-label="View live traffic for ${cp.name} on Google Maps"> <span style="display:none">View ${cp.name} traffic map</span>📍</a>
     </div>
   `;
 }
