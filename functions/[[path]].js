@@ -84,38 +84,83 @@ function renderChokepoint(cp) {
 }
 
 function getHtml({ chokepoints, renderedGrid }) {
+
+// --- In your rendering logic (app.js or server-side) ---
+const escapeQuotes = (str) => str ? str.replace(/"/g, '&quot;').replace(/'/g, '&apos;') : "";
+
+// Update your chokepoint template function to this:
+const renderChokepoint = (cp) => {
+  const safeName = escapeQuotes(cp.name);
+  return `
+    <div class="chokepoint ${cp.traffic.status}">
+      <h3 class="cp-name">${cp.name}</h3> 
+      <div class="cp-status">${cp.traffic.label}</div>
+      <div class="cp-time">Last checked: ${timeAgo(cp.traffic.checkedAt)}</div>
+      <a href="${cp.mapUrl}" 
+         target="_blank" 
+         class="map-link" 
+         title="View live traffic for ${safeName} on Google Maps" 
+         aria-label="View live traffic for ${safeName} on Google Maps">
+         📍
+      </a>
+    </div>
+  `;
+};
+
+// --- Your main HTML Response ---
 return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 
-<!-- Favicons -->
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="icon" href="/icons/icon-512.png" sizes="512x512" type="image/png">
 <link rel="icon" href="/icons/icon-192.png" sizes="192x192" type="image/png">
 
-<!-- PWA -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#111827">
 
-<!-- SEO -->
 <title>Pune Traffic Today – Live Traffic Status, Congestion & Alerts</title>
 <meta name="description" content="Check Pune traffic today with live traffic status, congestion updates, and real-time chokepoint alerts. Pune traffic is monitored every 10 minutes during daytime. No login required." />
 <meta name="keywords" content="pune traffic, pune traffic today, live pune traffic, pune traffic status, pune traffic updates, real time traffic pune" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="canonical" href="https://www.punetraffic.com/" />
 
-<!-- OneSignal -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "GovernmentService",
+  "name": "Pune Live Traffic Alerts",
+  "serviceType": "Traffic Monitoring",
+  "areaServed": {
+    "@type": "City",
+    "name": "Pune"
+  },
+  "provider": {
+    "@type": "Organization",
+    "name": "Pune Traffic",
+    "url": "https://punetraffic.com"
+  },
+  "description": "Real-time traffic status and push notification alerts for severe congestion in Pune."
+}
+</script>
+
 <link rel="preconnect" href="https://cdn.onesignal.com">
 <link rel="preconnect" href="https://api.onesignal.com">
-<link rel="dns-prefetch" href="https://cdn.onesignal.com">
-<link rel="dns-prefetch" href="https://api.onesignal.com">
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
 <style>
 ${STYLESHEET}
+/* Ensure cp-name as H3 looks correct */
+.cp-name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #111827;
+  line-height: 1.2;
+}
 </style>
 </head>
 
@@ -131,24 +176,28 @@ ${STYLESHEET}
     No login. No signup.
   </p>
 </header>
-<p class="message">Traffic status reflects actual travel delay; brief signal slowdowns are normal</p>
 
-<button id="quietBtn" class="quiet-btn">🔕 Set quiet hours</button>
-<button id="refreshBtn" class="refresh-btn">Refresh ⟳</button>
 <main>
+  <section class="seo-intro" style="padding: 10px; font-size: 0.8rem; color: #666; text-align:center;">
+    Real-time traffic monitoring for <strong>Hinjewadi</strong>, <strong>Baner</strong>, <strong>Mundhwa</strong>, and <strong>Koregaon Park</strong>. 
+    Get instant alerts for Pune road closures and congestion.
+  </section>
+
+  <p class="message">Traffic status reflects actual travel delay; brief signal slowdowns are normal</p>
+
+  <button id="quietBtn" class="quiet-btn">🔕 Set quiet hours</button>
+  <button id="refreshBtn" class="refresh-btn">Refresh ⟳</button>
+
   <div id="status"></div>
   <div id="grid" class="grid">
-    ${renderedGrid}
-  </div>
+    ${renderedGrid} 
+    </div>
 </main>
 
 <footer>
   Live Pune traffic monitoring • Real-time congestion alerts • Area-based Pune traffic notifications
 </footer>
 
-
-
-<!-- Floating Share Button -->
 <button id="floatingShareBtn" class="floating-share-btn" aria-label="Share Pune Traffic">
   📤
 </button>
@@ -160,7 +209,6 @@ ${STYLESHEET}
 
 </body>
 </html>`;
-}
 
 const STYLESHEET = `/*************************************************
  * BASE
