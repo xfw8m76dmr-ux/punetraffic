@@ -92,8 +92,9 @@ function generateSchema() {
     hour12: true 
   });
   
-  // Use today's date at 00:00:00 for the coverage start in IST
-  const todayStart = new Date().toLocaleDateString('en-CA') + "T00:00:00+05:30";
+  const todayDate = new Date().toLocaleDateString('en-CA');
+  const todayStart = todayDate + "T00:00:00+05:30";
+  const todayEnd = todayDate + "T23:59:59+05:30"; // Added for Event completeness
 
   const schema = [
     {
@@ -145,9 +146,13 @@ function generateSchema() {
       "about": {
         "@type": "Event",
         "name": "Pune Traffic Monitoring",
+        "startDate": todayStart, // Added: Mandatory for Event type
+        "endDate": todayEnd,     // Added: Best practice for Event type
+        "eventStatus": "https://schema.org/EventScheduled",
+        "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
         "location": {
-          "@type": "Place",
-          "name": "Pune, India"
+          "@type": "VirtualLocation",
+          "url": "https://punetraffic.com"
         }
       }
     },
