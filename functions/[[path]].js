@@ -116,7 +116,7 @@ function getDynamicDescription(chokepoints) {
   return defaultDesc;
 }
 
-function generateSchema(chokepointData) {
+function generateSchema(chokepointData = []) {
   const now = new Date().toISOString();
   const localeTime = new Date().toLocaleTimeString('en-IN', { 
     hour: '2-digit', 
@@ -265,7 +265,7 @@ return `<!DOCTYPE html>
 <link rel="dns-prefetch" href="https://cdn.onesignal.com">
 <link rel="dns-prefetch" href="https://api.onesignal.com">
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-${generateSchema(window.__PRE_LOADCHOKEPOINTS__ || [])}
+${generateSchema(window.__PRE_LOADCHOKEPOINTS__)}
 
 <style>
 ${STYLESHEET}
