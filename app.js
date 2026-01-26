@@ -161,10 +161,25 @@ async function toggleAreaSubscription(areaKey) {
   const OneSignal = await oneSignalReady;
 
   const permission = await OneSignal.Notifications.requestPermission();
-  if (!permission) {
-    showToast("🚦 Live alerts need a real browser. Open PuneTraffic in Chrome/Safari and allow notifications.");
+
+  if (Notification.permission !== 'granted') {
+    showToast(
+      "🚦 Live alerts need a real browser. Open PuneTraffic in Chrome/Safari and allow notifications."
+    );
     return;
   }
+
+  if (!localStorage.getItem('push_enabled_tracked')) {
+    window.zaraz?.track('push_notification_enabled', {
+      method: 'onesignal',
+      platform: 'pwa'
+    });
+  
+    localStorage.setItem('push_enabled_tracked', 'true');
+  }
+
+
+
   
   try {
     // 1. Set the new combined tag
