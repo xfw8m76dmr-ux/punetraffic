@@ -91,8 +91,9 @@ function generateSchema() {
     minute: '2-digit', 
     hour12: true 
   });
-  // Use today's date at 00:00:00 for the coverage start
-  const todayStart = new Date().toISOString().split('T')[0] + "T00:00:00+05:30";
+  
+  // Use today's date at 00:00:00 for the coverage start in IST
+  const todayStart = new Date().toLocaleDateString('en-CA') + "T00:00:00+05:30";
 
   const schema = [
     {
@@ -149,6 +150,36 @@ function generateSchema() {
           "name": "Pune, India"
         }
       }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How often is the Pune traffic status updated?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The dashboard is updated every 10 minutes, providing real-time data on chokepoints like Hinjewadi, Mundhwa Bridge, and University Chowk."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How can I get live traffic alerts for Pune?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can subscribe to push notifications on punetraffic.com. We send proactive alerts directly to your mobile when major congestion is detected."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is a login required to check Pune traffic today?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No login or signup is required. Our service is a free PWA (Progressive Web App) designed for quick access by Pune commuters."
+          }
+        }
+      ]
     }
   ];
 
