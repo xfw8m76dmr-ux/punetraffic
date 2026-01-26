@@ -84,6 +84,38 @@ function renderChokepoint(cp) {
   `;
 }
 
+/**
+ * Generates a dynamic SEO description based on live traffic data.
+ * Designed for SSR (Server-Side Rendering).
+ */
+function getDynamicDescription(chokepoints) {
+  const now = new Date();
+  // Get current hour in IST (UTC+5:30)
+  const istOffset = 5.5 * 60 * 60 * 1000;
+  const istTime = new Date(now.getTime() + istOffset);
+  const currentHour = istTime.getUTCHours();
+
+  // Baseline description for off-peak hours
+  const defaultDesc = "Check Pune traffic today with live status, congestion updates, and real-time chokepoint alerts. No login required.";
+
+  // Only generate dynamic alert text between 9 AM and 6 PM
+  if (currentHour >= 9 && currentHour < 18) {
+    if (!chokepoints || chokepoints.length === 0) return defaultDesc;
+
+    const critical = chokepoints.filter(cp => cp.traffic.status === 'CRITICAL').length;
+    const high = chokepoints.filter(cp => cp.traffic.status === 'HIGH').length;
+
+    if (critical === 0 && high === 0) {
+      return `Pune Traffic Update: All major routes are currently smooth. Real-time monitoring across ${chokepoints.length} chokepoints. No login required.`;
+    }
+
+    const alertText = `Alert: ${critical} critical jams and ${high} high congestion points detected in Pune.`;
+    return `${alertText} Get live updates for Hinjewadi, Mundhwa, and more. Updated every 10 mins.`;
+  }
+
+  return defaultDesc;
+}
+
 function generateSchema() {
   const now = new Date().toISOString();
   const localeTime = new Date().toLocaleTimeString('en-IN', { 
@@ -92,15 +124,25 @@ function generateSchema() {
     hour12: true 
   });
   
-  // Use today's date at 00:00:00 for the coverage start in IST
-  const todayStart = new Date().toLocaleDateString('en-CA') + "T00:00:00+05:30";
+  const todayDate = new Date().toLocaleDateString('en-CA');
+  const todayStart = todayDate + "T00:00:00+05:30";
+  const todayEnd = todayDate + "T23:59:59+05:30";
+  
+  // Extract chokepoint names for the ItemList
+  const chokepointData = window.__PRE_LOADCHOKEPOINTS__ || [];
+  const listItems = chokepointData.map((cp, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "name": cp.name
+  }));
 
   const schema = [
+    // 1. SERVICE & LOCAL BUSINESS SCHEMA
     {
       "@context": "https://schema.org",
       "@type": ["Service", "LocalBusiness"],
       "name": "Pune Traffic Live Alerts",
-      "description": "Real-time traffic congestion monitoring and proactive push alerts for Pune city. No login or signup required.",
+      "description": "Real-time traffic congestion monitoring for Pune. No login required.",
       "url": "https://punetraffic.com",
       "logo": "https://punetraffic.com/icons/icon-512.png",
       "address": {
@@ -114,43 +156,44 @@ function generateSchema() {
         "latitude": "18.5204",
         "longitude": "73.8567"
       },
-      "areaServed": "Pune, India",
-      "provider": {
-        "@type": "Organization",
-        "name": "Pune Traffic",
-        "url": "https://punetraffic.com"
-      },
-      "hasOfferCatalog": {
-        "@type": "OfferCatalog",
-        "name": "Traffic Alerts",
-        "itemListElement": [
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Live Congestion Updates" } },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Push Notifications for Traffic Jams" } }
-        ]
-      }
+      "areaServed": "Pune, India"
     },
+    // 2. LIVE BLOG POSTING (For real-time freshness)
     {
       "@context": "https://schema.org",
       "@type": "LiveBlogPosting",
       "headline": `Live Pune Traffic Updates at ${localeTime}`,
-      "description": "Live status of Pune's major chokepoints including Hinjewadi, Mundhwa, and University Chowk. Updated every 10 minutes.",
+      "description": "Live status of Pune's major chokepoints updated every 10 minutes.",
       "coverageStartTime": todayStart,
       "datePublished": now,
       "liveBlogUpdate": {
         "@type": "BlogPosting",
         "headline": `Update: Pune Traffic status as of ${localeTime}`,
         "datePublished": now,
-        "articleBody": "Current traffic status across 20+ chokepoints in Pune is being monitored. High-fidelity data refreshed every 10 minutes."
+        "articleBody": "Current traffic status across 20+ chokepoints in Pune is being monitored."
       },
       "about": {
         "@type": "Event",
         "name": "Pune Traffic Monitoring",
+        "startDate": todayStart,
+        "endDate": todayEnd,
+        "eventStatus": "https://schema.org/EventScheduled",
+        "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
         "location": {
-          "@type": "Place",
-          "name": "Pune, India"
+          "@type": "VirtualLocation",
+          "url": "https://punetraffic.com"
         }
       }
     },
+    // 3. THE ITEMLIST (The "Dashboard" view for SEO)
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Pune Traffic Chokepoints Monitored",
+      "description": "List of major traffic chokepoints in Pune monitored for live congestion status.",
+      "itemListElement": listItems
+    },
+    // 4. FAQ SCHEMA
     {
       "@context": "https://schema.org",
       "@type": "FAQPage",
@@ -160,15 +203,7 @@ function generateSchema() {
           "name": "How often is the Pune traffic status updated?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The dashboard is updated every 10 minutes, providing real-time data on chokepoints like Hinjewadi, Mundhwa Bridge, and University Chowk."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How can I get live traffic alerts for Pune?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "You can subscribe to push notifications on punetraffic.com. We send proactive alerts directly to your mobile when major congestion is detected."
+            "text": "The dashboard is updated every 10 minutes, providing real-time data on chokepoints like Hinjewadi, Mundhwa, and University Chowk."
           }
         },
         {
@@ -176,18 +211,19 @@ function generateSchema() {
           "name": "Is a login required to check Pune traffic today?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No login or signup is required. Our service is a free PWA (Progressive Web App) designed for quick access by Pune commuters."
+            "text": "No login or signup is required. Our service is a free PWA for quick access by Pune commuters."
           }
         }
       ]
     },
+    // 5. ORGANIZATION SCHEMA
     {
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "Pune Traffic Live",
       "url": "https://punetraffic.com",
       "logo": "https://punetraffic.com/icons/icon-512.png",
-      "description": "Pune Traffic Live is an independent real-time data initiative dedicated to helping Pune residents navigate city congestion through automated monitoring and instant alerts."
+      "description": "Pune Traffic Live is an independent real-time data initiative for Pune residents."
     }
   ];
 
@@ -213,7 +249,7 @@ return `<!DOCTYPE html>
 
 <!-- SEO -->
 <title>Pune Traffic Today – Live Traffic Status, Congestion & Alerts</title>
-<meta name="description" content="Check Pune traffic today with live traffic status, congestion updates, and real-time chokepoint alerts. Pune traffic is monitored every 10 minutes during daytime. No login required." />
+<meta name="description" content="<%= getDynamicDescription(chokepoints) %>">
 <meta name="keywords" content="pune traffic, pune traffic today, live pune traffic, pune traffic status, pune traffic updates, real time traffic pune" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="canonical" href="https://www.punetraffic.com/" />
