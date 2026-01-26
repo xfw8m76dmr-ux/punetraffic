@@ -50,7 +50,7 @@ function renderGrid(chokepoints) {
     .map(area => `
       <div class="area-card">
         <div class="area-header">
-          <h2>${area.name}</h2>
+          <h2>${area.name} Pune</h2>
           <button class="subscribe-btn">
             🔔 Alert me when Traffic Jams
           </button>
@@ -106,6 +106,11 @@ return `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="canonical" href="https://www.punetraffic.com/" />
 
+<meta property="og:title" content="Live Pune Traffic Status & Alerts">
+<meta property="og:description" content="No login, no ads. Just real-time traffic updates for Pune IT professionals.">
+<meta property="og:image" content="/icons/icon-512.png.png"> <meta property="og:url" content="https://punetraffic.com">
+<meta name="twitter:card" content="summary_large_image">
+
 <!-- OneSignal -->
 <link rel="preconnect" href="https://cdn.onesignal.com">
 <link rel="preconnect" href="https://api.onesignal.com">
@@ -113,26 +118,56 @@ return `<!DOCTYPE html>
 <link rel="dns-prefetch" href="https://api.onesignal.com">
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Service",
-  "name": "Pune Traffic Live Alerts",
-  "description": "Real-time traffic congestion monitoring for Pune city.",
-  "provider": {
-    "@type": "Organization",
-    "name": "Pune Traffic",
-    "url": "https://punetraffic.com"
+[
+  {
+    "@context": "https://schema.org",
+    "@type": ["Service", "LocalBusiness"],
+    "name": "Pune Traffic Live Alerts",
+    "description": "Real-time traffic congestion monitoring and proactive push alerts for Pune city. No login or signup required.",
+    "url": "https://punetraffic.com",
+    "logo": "https://punetraffic.com/icons/icon-512.png",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Pune",
+      "addressRegion": "MH",
+      "addressCountry": "IN"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "18.5204",
+      "longitude": "73.8567"
+    },
+    "areaServed": "Pune, India",
+    "provider": {
+      "@type": "Organization",
+      "name": "Pune Traffic",
+      "url": "https://punetraffic.com"
+    },
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Traffic Alerts",
+      "itemListElement": [
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Live Congestion Updates" } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Push Notifications for Traffic Jams" } }
+      ]
+    }
   },
-  "areaServed": "Pune, India",
-  "hasOfferCatalog": {
-    "@type": "OfferCatalog",
-    "name": "Traffic Alerts",
-    "itemListElement": [
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Live Congestion Updates" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Push Notifications for Traffic Jams" } }
-    ]
+  {
+    "@context": "https://schema.org",
+    "@type": "LiveBlogPosting",
+    "headline": "Live Pune Traffic Updates – Real-Time Congestion & Road Alerts",
+    "description": "Live status of Pune's major chokepoints including Hinjewadi, Mundhwa, and University Chowk. Updated every 10 minutes.",
+    "coverageStartTime": "2026-01-26T00:00:00+05:30",
+    "about": {
+      "@type": "Event",
+      "name": "Pune Traffic Monitoring",
+      "location": {
+        "@type": "Place",
+        "name": "Pune, India"
+      }
+    }
   }
-}
+]
 </script>
 <style>
 ${STYLESHEET}
@@ -163,7 +198,7 @@ ${STYLESHEET}
 </main>
 
 <footer>
-  Live Pune traffic monitoring • Real-time congestion alerts • Area-based Pune traffic notifications
+  Pune Traffic Live: Your real-time dashboard for navigating Pune’s evolving landscape. We provide up-to-the-minute traffic status updates across major IT corridors and residential hubs, from the heavy congestion of Hinjewadi IT Park and Bhumkar Chowk in the West to the bustling transit points of Mundhwa Bridge, Kharadi, and Magarpatta in the East. As Pune scales with new Metro Line construction, flyover projects at University Chowk, and diversions at Chandni Chowk, our platform monitors over 20+ critical chokepoints every 10 minutes to deliver proactive push notification alerts. Whether you are commuting via the Mumbai-Pune Expressway service roads, navigating Nal Stop, or checking for road closures today, our no-login, high-speed PWA ensures you have the latest data to beat the city's peak-hour jams and monsoon waterlogging delays without any friction.
 </footer>
 
 <!-- 🔥 PRELOADED DATA -->
