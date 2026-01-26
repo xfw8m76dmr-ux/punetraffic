@@ -153,12 +153,14 @@ async function toggleAreaSubscription(areaKey) {
 
   const subs = getSubscriptions();
 
-  if(subs.length >= 2) {
+
+  
+  const isSub = subs.includes(areaKey);
+
+    if(!isSub && subs.length >= 2) {
     showToast("You can only subscribe to alerts for Two Areas. Remove alerts from one of the area to enable.")
     return;
   }
-  
-  const isSub = subs.includes(areaKey);
   const newSubs = isSub ? subs.filter(a => a !== areaKey) : [...subs, areaKey];
 
   // Logic: ["south", "west"] -> "south+west"
