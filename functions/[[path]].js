@@ -1,7 +1,9 @@
 export async function onRequest(context) {
   const { request } = context;
   const url = new URL(request.url);
-
+  // Example logic to add to your refresh function
+  const now = new Date().toISOString(); // e.g., "2026-01-26T12:40:00.000Z"
+  
   // Only SSR homepage
   if (url.pathname !== "/") {
     return context.next();
@@ -50,7 +52,7 @@ function renderGrid(chokepoints) {
     .map(area => `
       <div class="area-card">
         <div class="area-header">
-          <h2>${area.name}</h2>
+          <h2>${area.name} Pune</h2>
           <button class="subscribe-btn">
             🔔 Alert me when Traffic Jams
           </button>
@@ -82,6 +84,116 @@ function renderChokepoint(cp) {
   `;
 }
 
+function generateSchema() {
+  const now = new Date().toISOString();
+  const localeTime = new Date().toLocaleTimeString('en-IN', { 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    hour12: true 
+  });
+  
+  // Use today's date at 00:00:00 for the coverage start in IST
+  const todayStart = new Date().toLocaleDateString('en-CA') + "T00:00:00+05:30";
+
+  const schema = [
+    {
+      "@context": "https://schema.org",
+      "@type": ["Service", "LocalBusiness"],
+      "name": "Pune Traffic Live Alerts",
+      "description": "Real-time traffic congestion monitoring and proactive push alerts for Pune city. No login or signup required.",
+      "url": "https://punetraffic.com",
+      "logo": "https://punetraffic.com/icons/icon-512.png",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Pune",
+        "addressRegion": "MH",
+        "addressCountry": "IN"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "18.5204",
+        "longitude": "73.8567"
+      },
+      "areaServed": "Pune, India",
+      "provider": {
+        "@type": "Organization",
+        "name": "Pune Traffic",
+        "url": "https://punetraffic.com"
+      },
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Traffic Alerts",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Live Congestion Updates" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Push Notifications for Traffic Jams" } }
+        ]
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "LiveBlogPosting",
+      "headline": `Live Pune Traffic Updates at ${localeTime}`,
+      "description": "Live status of Pune's major chokepoints including Hinjewadi, Mundhwa, and University Chowk. Updated every 10 minutes.",
+      "coverageStartTime": todayStart,
+      "datePublished": now,
+      "liveBlogUpdate": {
+        "@type": "BlogPosting",
+        "headline": `Update: Pune Traffic status as of ${localeTime}`,
+        "datePublished": now,
+        "articleBody": "Current traffic status across 20+ chokepoints in Pune is being monitored. High-fidelity data refreshed every 10 minutes."
+      },
+      "about": {
+        "@type": "Event",
+        "name": "Pune Traffic Monitoring",
+        "location": {
+          "@type": "Place",
+          "name": "Pune, India"
+        }
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How often is the Pune traffic status updated?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The dashboard is updated every 10 minutes, providing real-time data on chokepoints like Hinjewadi, Mundhwa Bridge, and University Chowk."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How can I get live traffic alerts for Pune?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can subscribe to push notifications on punetraffic.com. We send proactive alerts directly to your mobile when major congestion is detected."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is a login required to check Pune traffic today?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No login or signup is required. Our service is a free PWA (Progressive Web App) designed for quick access by Pune commuters."
+          }
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Pune Traffic Live",
+      "url": "https://punetraffic.com",
+      "logo": "https://punetraffic.com/icons/icon-512.png",
+      "description": "Pune Traffic Live is an independent real-time data initiative dedicated to helping Pune residents navigate city congestion through automated monitoring and instant alerts."
+    }
+  ];
+
+  return `<script type="application/ld+json">${JSON.stringify(schema)}</script>`;
+}
+
 function getHtml({ chokepoints, renderedGrid }) {
 return `<!DOCTYPE html>
 <html lang="en">
@@ -106,34 +218,19 @@ return `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="canonical" href="https://www.punetraffic.com/" />
 
+<meta property="og:title" content="Live Pune Traffic Status & Alerts">
+<meta property="og:description" content="No login, no ads. Just real-time traffic updates for Pune IT professionals.">
+<meta property="og:image" content="/icons/icon-512.png"> <meta property="og:url" content="https://punetraffic.com">
+<meta name="twitter:card" content="summary_large_image">
+
 <!-- OneSignal -->
 <link rel="preconnect" href="https://cdn.onesignal.com">
 <link rel="preconnect" href="https://api.onesignal.com">
 <link rel="dns-prefetch" href="https://cdn.onesignal.com">
 <link rel="dns-prefetch" href="https://api.onesignal.com">
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Service",
-  "name": "Pune Traffic Live Alerts",
-  "description": "Real-time traffic congestion monitoring for Pune city.",
-  "provider": {
-    "@type": "Organization",
-    "name": "Pune Traffic",
-    "url": "https://punetraffic.com"
-  },
-  "areaServed": "Pune, India",
-  "hasOfferCatalog": {
-    "@type": "OfferCatalog",
-    "name": "Traffic Alerts",
-    "itemListElement": [
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Live Congestion Updates" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Push Notifications for Traffic Jams" } }
-    ]
-  }
-}
-</script>
+${generateSchema()}
+
 <style>
 ${STYLESHEET}
 </style>
@@ -163,7 +260,7 @@ ${STYLESHEET}
 </main>
 
 <footer>
-  Live Pune traffic monitoring • Real-time congestion alerts • Area-based Pune traffic notifications
+  Pune Traffic Live: Your real-time dashboard for navigating Pune’s evolving landscape. We provide up-to-the-minute traffic status updates across major IT corridors and residential hubs, from the heavy congestion of <strong>Hinjewadi IT Park </strong> and <strong>Bhumkar Chowk</strong> in the West to the bustling transit points of <strong>Mundhwa Bridge, Kharadi, and Magarpatta</strong> in the East. As Pune scales with new Metro Line construction, flyover projects at <strong>University Chowk</strong>, and diversions at <strong>Chandni Chowk</strong>, our platform monitors over 20+ critical chokepoints every 10 minutes to deliver proactive push notification alerts. Whether you are commuting via the<strong> Mumbai-Pune Expressway </strong>service roads, navigating <strong>Nal Stop</strong>, or checking for road closures today, our no-login, high-speed PWA ensures you have the latest data to beat the city's peak-hour jams and monsoon waterlogging delays without any friction.
 </footer>
 
 <!-- 🔥 PRELOADED DATA -->
