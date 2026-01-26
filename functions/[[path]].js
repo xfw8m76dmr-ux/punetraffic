@@ -265,7 +265,7 @@ return `<!DOCTYPE html>
 <link rel="dns-prefetch" href="https://cdn.onesignal.com">
 <link rel="dns-prefetch" href="https://api.onesignal.com">
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-${generateSchema(window.__PRE_LOADCHOKEPOINTS__)}
+${generateSchema(chokepoints)}
 
 <style>
 ${STYLESHEET}
