@@ -116,7 +116,7 @@ function getDynamicDescription(chokepoints) {
   return defaultDesc;
 }
 
-function generateSchema() {
+function generateSchema(chokepointData) {
   const now = new Date().toISOString();
   const localeTime = new Date().toLocaleTimeString('en-IN', { 
     hour: '2-digit', 
@@ -129,7 +129,6 @@ function generateSchema() {
   const todayEnd = todayDate + "T23:59:59+05:30";
   
   // Extract chokepoint names for the ItemList
-  const chokepointData = window.__PRE_LOADCHOKEPOINTS__ || [];
   const listItems = chokepointData.map((cp, index) => ({
     "@type": "ListItem",
     "position": index + 1,
@@ -249,14 +248,15 @@ return `<!DOCTYPE html>
 
 <!-- SEO -->
 <title>Pune Traffic Today – Live Traffic Status, Congestion & Alerts</title>
-<meta name="description" content="<%= getDynamicDescription(chokepoints) %>">
+<meta name="description" content="${getDynamicDescription(chokepoints)}">
 <meta name="keywords" content="pune traffic, pune traffic today, live pune traffic, pune traffic status, pune traffic updates, real time traffic pune" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="canonical" href="https://www.punetraffic.com/" />
 
 <meta property="og:title" content="Live Pune Traffic Status & Alerts">
 <meta property="og:description" content="No login, no ads. Just real-time traffic updates for Pune IT professionals.">
-<meta property="og:image" content="/icons/icon-512.png"> <meta property="og:url" content="https://punetraffic.com">
+<meta property="og:image" content="/icons/icon-512.png"> 
+<meta property="og:url" content="https://punetraffic.com">
 <meta name="twitter:card" content="summary_large_image">
 
 <!-- OneSignal -->
@@ -265,7 +265,7 @@ return `<!DOCTYPE html>
 <link rel="dns-prefetch" href="https://cdn.onesignal.com">
 <link rel="dns-prefetch" href="https://api.onesignal.com">
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-${generateSchema()}
+${generateSchema(window.__PRE_LOADCHOKEPOINTS__ || [])}
 
 <style>
 ${STYLESHEET}
