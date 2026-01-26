@@ -180,6 +180,14 @@ function generateSchema() {
           }
         }
       ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Pune Traffic Live",
+      "url": "https://punetraffic.com",
+      "logo": "https://punetraffic.com/icons/icon-512.png",
+      "description": "Pune Traffic Live is an independent real-time data initiative dedicated to helping Pune residents navigate city congestion through automated monitoring and instant alerts."
     }
   ];
 
