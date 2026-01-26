@@ -108,7 +108,7 @@ return `<!DOCTYPE html>
 
 <meta property="og:title" content="Live Pune Traffic Status & Alerts">
 <meta property="og:description" content="No login, no ads. Just real-time traffic updates for Pune IT professionals.">
-<meta property="og:image" content="/icons/icon-512.png.png"> <meta property="og:url" content="https://punetraffic.com">
+<meta property="og:image" content="/icons/icon-512.png"> <meta property="og:url" content="https://punetraffic.com">
 <meta name="twitter:card" content="summary_large_image">
 
 <!-- OneSignal -->
