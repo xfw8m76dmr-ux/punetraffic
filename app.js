@@ -134,6 +134,7 @@ window.OneSignalDeferred.push(async function (OneSignal) {
  * AREA SUBSCRIBE / UNSUBSCRIBE
  *************************************************/
 async function toggleAreaSubscription(areaKey) {
+  
 
    if (isFacebookBrowser || isInstagramBrowser) {
     showToast(
@@ -153,6 +154,12 @@ async function toggleAreaSubscription(areaKey) {
 
   const subs = getSubscriptions();
 
+  if(!localStorage.getItem('push_enabled_tracked') && subs.length === 0) {
+    window.zaraz?.track('alert_cta_clicked', {
+      method: 'onesignal',
+      platform: 'pwa'
+    });
+  }
 
   
   const isSub = subs.includes(areaKey);
