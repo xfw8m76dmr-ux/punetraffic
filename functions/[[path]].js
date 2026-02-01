@@ -3,6 +3,11 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   // Example logic to add to your refresh function
   const now = new Date().toISOString(); // e.g., "2026-01-26T12:40:00.000Z"
+
+   // 🚫 Skip blog completely
+  if (url.hostname === "blog.punetraffic.com") {
+    return context.next();
+  }
   
   // Only SSR homepage
   if (url.pathname !== "/") {
