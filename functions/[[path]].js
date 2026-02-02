@@ -299,27 +299,53 @@ ${STYLESHEET}
   </div>
 </main>
 
-<footer>
-  <p>
-    <strong>Pune Traffic Live</strong> is your real-time dashboard for navigating Pune’s evolving road network. 
-    We provide up-to-the-minute traffic status updates across major IT corridors and residential hubs — from heavy congestion at 
-    <strong>Hinjewadi IT Park</strong> and <strong>Bhumkar Chowk</strong> in the West to busy transit points like 
-    <strong>Mundhwa Bridge</strong>, <strong>Kharadi</strong>, and <strong>Magarpatta</strong> in the East.
-  </p>
+<footer style="padding: 2rem 1rem; background-color: #f9f9f9; border-top: 1px solid #eee;">
+  <div style="margin-bottom: 2rem; max-width: 1200px; margin-left: auto; margin-right: auto;">
+    <p style="color: #555; line-height: 1.6;">
+      <strong>Pune Traffic Live</strong> is your real-time dashboard for navigating Pune’s evolving road network. 
+      We provide up-to-the-minute traffic status updates across major IT corridors and residential hubs — from heavy congestion at 
+      <strong>Hinjewadi IT Park</strong> and <strong>Bhumkar Chowk</strong> in the West to busy transit points like 
+      <strong>Mundhwa Bridge</strong>, <strong>Kharadi</strong>, and <strong>Magarpatta</strong> in the East.
+    </p>
 
-  <p>
-    As Pune expands with new Metro line construction, flyovers at <strong>University Chowk</strong>, and diversions at 
-    <strong>Chandni Chowk</strong>, we monitor 20+ critical chokepoints every 10 minutes to deliver proactive traffic alerts. 
-    Whether you’re commuting via the <strong>Mumbai–Pune Expressway</strong> service roads, navigating <strong>Nal Stop</strong>, 
-    or checking road closures during monsoon waterlogging, our no-login, high-speed PWA helps you avoid peak-hour jams.
-  </p>
+    <p style="color: #555; line-height: 1.6;">
+      As Pune expands with new Metro line construction, flyovers at <strong>University Chowk</strong>, and diversions at 
+      <strong>Chandni Chowk</strong>, we monitor 20+ critical chokepoints every 10 minutes to deliver proactive traffic alerts. 
+      Whether you’re commuting via the <strong>Mumbai–Pune Expressway</strong> service roads, navigating <strong>Nal Stop</strong>, 
+      or checking road closures during monsoon waterlogging, our no-login, high-speed PWA helps you avoid peak-hour jams.
+    </p>
+  </div>
 
-  <p>
-    👉 Read traffic insights, explainers, and travel tips on our 
-    <a href="https://blog.punetraffic.com" target="_blank" rel="noopener">
-      PuneTraffic Blog
-    </a>.
-  </p>
+  <hr style="border: 0; border-top: 1px solid #ddd; margin: 2rem 0;">
+
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; max-width: 1200px; margin: 0 auto; gap: 2rem;">
+    
+    <div style="flex: 1; min-width: 200px;">
+      <h4 style="margin-bottom: 1rem; color: #333;">Site Navigation</h4>
+      <ul style="list-style: none; padding: 0; line-height: 2;">
+        <li><a href="https://punetraffic.com" style="text-decoration: none; color: #007bff;">Live Traffic Map</a></li>
+        <li><a href="https://blog.punetraffic.com" style="text-decoration: none; color: #007bff;">PuneTraffic Blog</a></li>
+        <li><a href="https://blog.punetraffic.com/category/traffic-updates" style="text-decoration: none; color: #007bff;">Traffic News</a></li>
+      </ul>
+    </div>
+
+    <div style="flex: 1; min-width: 200px;">
+      <h4 style="margin-bottom: 1rem; color: #333;">Legal & Trust</h4>
+      <ul style="list-style: none; padding: 0; line-height: 2;">
+        <li><a href="https://blog.punetraffic.com/about-us" style="text-decoration: none; color: #007bff;">About Us</a></li>
+        <li><a href="https://blog.punetraffic.com/contact-us" style="text-decoration: none; color: #007bff;">Contact Us</a></li>
+        <li><a href="https://blog.punetraffic.com/privacy-policy" style="text-decoration: none; color: #007bff;">Privacy Policy</a></li>
+        <li><a href="https://blog.punetraffic.com/terms-and-conditions" style="text-decoration: none; color: #007bff;">Terms & Conditions</a></li>
+      </ul>
+    </div>
+
+    <div style="flex: 1; min-width: 200px;">
+      <h4 style="margin-bottom: 1rem; color: #333;">Community</h4>
+      <p style="font-size: 0.9rem; color: #666;">Helping Pune commute better since 2024. Join our mission to reduce road congestion.</p>
+      <p style="font-size: 0.85rem; color: #999; margin-top: 1rem;">© 2026 PuneTraffic.com. All rights reserved.</p>
+    </div>
+
+  </div>
 </footer>
 
 
