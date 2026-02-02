@@ -300,8 +300,28 @@ ${STYLESHEET}
 </main>
 
 <footer>
-  Pune Traffic Live: Your real-time dashboard for navigating Pune’s evolving landscape. We provide up-to-the-minute traffic status updates across major IT corridors and residential hubs, from the heavy congestion of <strong>Hinjewadi IT Park </strong> and <strong>Bhumkar Chowk</strong> in the West to the bustling transit points of <strong>Mundhwa Bridge, Kharadi, and Magarpatta</strong> in the East. As Pune scales with new Metro Line construction, flyover projects at <strong>University Chowk</strong>, and diversions at <strong>Chandni Chowk</strong>, our platform monitors over 20+ critical chokepoints every 10 minutes to deliver proactive push notification alerts. Whether you are commuting via the<strong> Mumbai-Pune Expressway </strong>service roads, navigating <strong>Nal Stop</strong>, or checking for road closures today, our no-login, high-speed PWA ensures you have the latest data to beat the city's peak-hour jams and monsoon waterlogging delays without any friction.
+  <p>
+    <strong>Pune Traffic Live</strong> is your real-time dashboard for navigating Pune’s evolving road network. 
+    We provide up-to-the-minute traffic status updates across major IT corridors and residential hubs — from heavy congestion at 
+    <strong>Hinjewadi IT Park</strong> and <strong>Bhumkar Chowk</strong> in the West to busy transit points like 
+    <strong>Mundhwa Bridge</strong>, <strong>Kharadi</strong>, and <strong>Magarpatta</strong> in the East.
+  </p>
+
+  <p>
+    As Pune expands with new Metro line construction, flyovers at <strong>University Chowk</strong>, and diversions at 
+    <strong>Chandni Chowk</strong>, we monitor 20+ critical chokepoints every 10 minutes to deliver proactive traffic alerts. 
+    Whether you’re commuting via the <strong>Mumbai–Pune Expressway</strong> service roads, navigating <strong>Nal Stop</strong>, 
+    or checking road closures during monsoon waterlogging, our no-login, high-speed PWA helps you avoid peak-hour jams.
+  </p>
+
+  <p>
+    👉 Read traffic insights, explainers, and travel tips on our 
+    <a href="https://blog.punetraffic.com" target="_blank" rel="noopener">
+      PuneTraffic Blog
+    </a>.
+  </p>
 </footer>
+
 
 <!-- 🔥 PRELOADED DATA -->
 <script>
