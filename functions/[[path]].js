@@ -325,7 +325,6 @@ ${STYLESHEET}
       <ul style="list-style: none; padding: 0; line-height: 2;">
         <li><a href="https://punetraffic.com" style="text-decoration: none; color: #007bff;">Live Traffic Map</a></li>
         <li><a href="https://blog.punetraffic.com" style="text-decoration: none; color: #007bff;">PuneTraffic Blog</a></li>
-        <li><a href="https://blog.punetraffic.com/category/traffic-updates" style="text-decoration: none; color: #007bff;">Traffic News</a></li>
       </ul>
     </div>
 
