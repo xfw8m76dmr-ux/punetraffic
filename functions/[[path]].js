@@ -55,9 +55,9 @@ function renderGrid(chokepoints) {
 
   return Object.values(grouped)
     .map(area => `
-      <div class="area-card">
+      <div class="area-card" aria-labelledby="${area.name}-pune">
         <div class="area-header">
-          <h2>${area.name} Pune</h2>
+          <h2 id="${area.name}-pune">${area.name} Pune</h2>
           <button class="subscribe-btn">
             🔔 Alert me when Traffic Jams
           </button>
@@ -290,7 +290,7 @@ ${STYLESHEET}
   </p>
 </header>
 
-<p class="message">Traffic status reflects actual travel delay; brief signal slowdowns are normal</p>
+<p class="message">Traffic status is based on observed travel delay, not momentary signal stops.</p>
 
 <button id="quietBtn" class="quiet-btn">🔕 Set quiet hours</button>
 <button id="refreshBtn" class="refresh-btn">Refresh ⟳</button>
@@ -341,6 +341,15 @@ ${STYLESHEET}
     </div>
 
     <div style="flex: 1; min-width: 200px;">
+        <section id="data-methodology">
+          <h2>How Pune traffic data is monitored</h2>
+          <p>
+            Traffic conditions are monitored every 10 minutes across 20+ Pune chokepoints
+            using real-time movement patterns and delay ratios acquired from various Traffic Insight Sources. Alerts are triggered only
+            when sustained congestion is detected.
+          </p>
+        </section>
+
       <h4 style="margin-bottom: 1rem; color: #333;">Community</h4>
       <p style="font-size: 0.9rem; color: #666;">Helping Pune commute better since 2024. Join our mission to reduce road congestion.</p>
       <p style="font-size: 0.85rem; color: #999; margin-top: 1rem;">© 2026 PuneTraffic.com. All rights reserved.</p>
