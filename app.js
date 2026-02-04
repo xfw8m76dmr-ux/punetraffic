@@ -140,7 +140,7 @@ async function toggleAreaSubscription(areaKey) {
     return;
   }
 
-  const decision = await showAlertConfirm(areaName);
+  const decision = await showAlertConfirm(areaKey);
 
   if (!decision) {
     return;
