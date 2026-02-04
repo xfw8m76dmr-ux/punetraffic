@@ -286,7 +286,8 @@ ${STYLESHEET}
   <p class="hero-text">
     We alert you <strong>only when Pune roads actually jam</strong> — not for small slowdowns.<br>
     Daytime alerts (9 AM – 6 PM). <strong>No login. No spam.</strong><br>
-    <span class="mute-note">🔕 Mute for today anytime from the notification.</span>
+    <span class="mute-note">🔕 Mute for today anytime from the notification.</span><br>
+    <a href="#" onclick="showDemoNotification(); return false;">🔔 See example traffic alert</a>
   </p>
 </header>
 
@@ -929,5 +930,43 @@ footer {
   background: #1f2933;
   color: #d1d5db;
 }
+
+.demo-notification {
+  position: fixed;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 24px);
+  max-width: 420px;
+  background: #111827;
+  color: #e5e7eb;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  z-index: 10001;
+  transition: top 0.4s ease;
+}
+
+.demo-notification.show {
+  top: 12px;
+}
+
+.demo-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.demo-body {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.demo-footer {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
 
 `
