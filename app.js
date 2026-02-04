@@ -134,17 +134,25 @@ window.OneSignalDeferred.push(async function (OneSignal) {
  * AREA SUBSCRIBE / UNSUBSCRIBE
  *************************************************/
 async function toggleAreaSubscription(areaKey) {
+
+  const subs = getSubscriptions();
+
+  const isSub = subs.includes(areaKey);
+  
    // iPhone guard
-  if (isIOS && !isPWA) {
+  if (!isSub & isIOS && !isPWA) {
     showIOSHelper();
     return;
   }
 
-  const decision = await showAlertConfirm(areaKey);
+  if(!isSub) {
+    const decision = await showAlertConfirm(areaKey);
 
-  if (!decision) {
-    return;
+    if (!decision) {
+      return;
+    }
   }
+
 
    if (isFacebookBrowser || isInstagramBrowser) {
     showToast(
@@ -162,7 +170,7 @@ async function toggleAreaSubscription(areaKey) {
   
   // ... (Keep your existing Browser/iOS/PWA checks) ...
 
-  const subs = getSubscriptions();
+
 
   if(!localStorage.getItem('push_enabled_tracked') && subs.length === 0) {
     window.zaraz?.track('alert_cta_clicked', {
@@ -172,9 +180,9 @@ async function toggleAreaSubscription(areaKey) {
   }
 
   
-  const isSub = subs.includes(areaKey);
+  
 
-    if(!isSub && subs.length >= 2) {
+  if(!isSub && subs.length >= 2) {
     showToast("You can only subscribe to alerts for Two Areas. Remove alerts from one of the area to enable.")
     return;
   }
