@@ -145,6 +145,11 @@ async function toggleAreaSubscription(areaKey) {
     return;
   }
 
+  if(!isSub && subs.length >= 2) {
+    showToast("You can only subscribe to alerts for Two Areas. Remove alerts from one of the area to enable.")
+    return;
+  }
+
   if(!isSub) {
     const decision = await showAlertConfirm(areaKey);
 
@@ -182,10 +187,7 @@ async function toggleAreaSubscription(areaKey) {
   
   
 
-  if(!isSub && subs.length >= 2) {
-    showToast("You can only subscribe to alerts for Two Areas. Remove alerts from one of the area to enable.")
-    return;
-  }
+ 
   const newSubs = isSub ? subs.filter(a => a !== areaKey) : [...subs, areaKey];
 
   // Logic: ["south", "west"] -> "south+west"
