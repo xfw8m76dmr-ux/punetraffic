@@ -937,7 +937,7 @@ footer {
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 24px);
-  max-width: 420px;
+  max-width: 380px;
   background: #111827;
   color: #e5e7eb;
   border-radius: 14px;
