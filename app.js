@@ -454,7 +454,7 @@ function showAlertConfirm(areaName) {
       title: "🚦 Get alerted before traffic jams",
       body: `
         <p>
-          We’ll notify you <strong>only when ${areaName} actually jams</strong>.<br>
+          We’ll notify you <strong>only when ${areaName} Pune actually jams</strong>.<br>
           Daytime alerts only. No spam.
         </p>
         <p class="mute-note">🔕 Mute for today anytime</p>
