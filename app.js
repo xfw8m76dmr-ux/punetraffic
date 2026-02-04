@@ -189,9 +189,7 @@ async function toggleAreaSubscription(areaKey) {
   const permission = await OneSignal.Notifications.requestPermission();
 
   if (Notification.permission !== 'granted') {
-    showToast(
-      "🚦 Live alerts need a real browser. Open PuneTraffic in Chrome/Safari and allow notifications."
-    );
+    handleBlockedNotifications();
     return;
   }
 
@@ -532,5 +530,57 @@ function showModal({ title, body, actions = [] }) {
   });
 
   modal.querySelector(".pt-backdrop").onclick = () => modal.remove();
+}
+
+
+function handleBlockedNotifications() {
+  if (isIOS()) {
+    if (!isInStandaloneMode()) {
+      showIOSAddToHomeHelp();
+    } else {
+      showIOSNotificationSettingsHelp();
+    }
+  } else {
+    showBrowserNotificationHelp();
+  }
+}
+
+
+function showBrowserNotificationHelp() {
+  showModal({
+    title: "🔕 Notifications are blocked",
+    body: `
+      <p>
+        Alerts are turned off for PuneTraffic in your browser.
+      </p>
+      <ol style="text-align:left">
+        <li>Tap the <strong>🔒 lock</strong> near the address bar</li>
+        <li>Open <strong>Site settings</strong></li>
+        <li>Set <strong>Notifications → Allow</strong></li>
+        <li>Refresh this page</li>
+      </ol>
+    `,
+    actions: [{ label: "Got it", type: "primary" }]
+  });
+}
+
+
+
+function showIOSNotificationSettingsHelp() {
+  showModal({
+    title: "🔕 Alerts are turned off on iPhone",
+    body: `
+      <p>
+        Notifications for PuneTraffic are disabled in iOS settings.
+      </p>
+      <ol style="text-align:left">
+        <li>Open <strong>Settings</strong></li>
+        <li>Go to <strong>Notifications</strong></li>
+        <li>Find <strong>PuneTraffic</strong></li>
+        <li>Turn on <strong>Allow Notifications</strong></li>
+      </ol>
+    `,
+    actions: [{ label: "Got it", type: "primary" }]
+  });
 }
 
