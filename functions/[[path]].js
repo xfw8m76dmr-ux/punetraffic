@@ -255,7 +255,7 @@ return `<!DOCTYPE html>
 <title>Pune Traffic Today – Live Traffic Status, Congestion & Alerts</title>
 <meta name="description" content="${getDynamicDescription(chokepoints)}">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="canonical" href="https://www.punetraffic.com/" />
+<link rel="canonical" href="https://punetraffic.com/" />
 
 <meta property="og:title" content="Live Pune Traffic Status & Alerts">
 <meta property="og:description" content="No login, no ads. Just real-time traffic updates for Pune IT professionals.">
