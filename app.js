@@ -594,3 +594,36 @@ function showIOSNotificationSettingsHelp() {
   });
 }
 
+function showDemoNotification() {
+  let el = document.getElementById("demoNotification");
+
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "demoNotification";
+    el.className = "demo-notification";
+    el.innerHTML = `
+      <div class="demo-title">🚦 PuneTraffic Alert</div>
+      <div class="demo-body">
+        Mundhwa Chowk just turned <strong>red</strong>.<br>
+        Expect ~18 min delay.
+      </div>
+      <div class="demo-footer">🔕 Mute for today</div>
+    `;
+    document.body.appendChild(el);
+  }
+
+  // Reset state
+  el.classList.remove("show");
+
+  // Slide in
+  requestAnimationFrame(() => {
+    el.classList.add("show");
+  });
+
+  // Auto hide
+  setTimeout(() => {
+    el.classList.remove("show");
+  }, 3500);
+}
+
+
