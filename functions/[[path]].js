@@ -280,14 +280,16 @@ ${STYLESHEET}
 
 <div id="ptr-indicator">↓ Pull to refresh</div>
 
-<header>
+<header class="hero">
   <h1>🚦 Pune Traffic – Live Status & Real-Time Alerts</h1>
-  <p>
-    We monitor Pune traffic every 10 minutes and alert you with Notification on your Mobile.
-    Daytime alerts (9 AM – 6 PM), only when traffic gets jammed.
-    No login. No signup.
+
+  <p class="hero-text">
+    We alert you <strong>only when Pune roads actually jam</strong> — not for small slowdowns.<br>
+    Daytime alerts (9 AM – 6 PM). <strong>No login. No spam.</strong><br>
+    <span class="mute-note">🔕 Mute for today anytime from the notification.</span>
   </p>
 </header>
+
 <p class="message">Traffic status reflects actual travel delay; brief signal slowdowns are normal</p>
 
 <button id="quietBtn" class="quiet-btn">🔕 Set quiet hours</button>
@@ -395,17 +397,36 @@ header {
 }
 
 
-header h1 {
-  margin: 0;
-  font-size: 1.4rem;
-  font-weight: 700;
+.hero {
+  padding: 16px 20px;
+  background: #0f172a; /* dark navy */
+  color: #e5e7eb;
+  text-align: center;
 }
 
-header p {
-  margin-top: 6px;
-  font-size: 14px;
-  opacity: 0.85;
+.hero h1 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
+
+.hero-text {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #d1d5db;
+}
+
+.hero-text strong {
+  color: #ffffff;
+}
+
+.mute-note {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
 
 main {
   max-width: 900px;
