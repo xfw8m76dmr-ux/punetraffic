@@ -863,4 +863,62 @@ footer {
   opacity: 0;
   pointer-events: none;
 }
+
+#pt-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.pt-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.pt-modal-box {
+  position: relative;
+  background: #0f172a;
+  color: #e5e7eb;
+  max-width: 360px;
+  width: 90%;
+  margin: 20vh auto;
+  padding: 18px;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.pt-modal-box h3 {
+  margin-bottom: 10px;
+}
+
+.pt-modal-body {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.pt-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.pt-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.9rem;
+}
+
+.pt-btn.primary {
+  background: #16a34a;
+  color: #fff;
+}
+
+.pt-btn.secondary {
+  background: #1f2933;
+  color: #d1d5db;
+}
+
 `
