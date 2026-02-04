@@ -134,7 +134,17 @@ window.OneSignalDeferred.push(async function (OneSignal) {
  * AREA SUBSCRIBE / UNSUBSCRIBE
  *************************************************/
 async function toggleAreaSubscription(areaKey) {
-  
+   // iPhone guard
+  if (isIOS && !isPWA) {
+    showIOSHelper();
+    return;
+  }
+
+  const decision = await showAlertConfirm(areaName);
+
+  if (!decision) {
+    return;
+  }
 
    if (isFacebookBrowser || isInstagramBrowser) {
     showToast(
@@ -437,3 +447,90 @@ refreshButton.addEventListener("click", async () => {
 
 
 window.refreshChokepoints = refreshChokepoints;
+
+function showAlertConfirm(areaName) {
+  return new Promise((resolve) => {
+    showModal({
+      title: "🚦 Get alerted before traffic jams",
+      body: `
+        <p>
+          We’ll notify you <strong>only when ${areaName} actually jams</strong>.<br>
+          Daytime alerts only. No spam.
+        </p>
+        <p class="mute-note">🔕 Mute for today anytime</p>
+      `,
+      actions: [
+        {
+          label: "Yes, alert me",
+          type: "primary",
+          onClick: () => resolve(true)
+        },
+        {
+          label: "Not now",
+          onClick: () => resolve(false)
+        }
+      ]
+    });
+  });
+}
+
+
+function showIOSHelper() {
+  showModal({
+    title: "📲 Enable alerts on iPhone",
+    body: `
+      <ol style="text-align:left">
+        <li>Tap <strong>Share ⬆️</strong> in Safari</li>
+        <li>Tap <strong>Add to Home Screen</strong></li>
+        <li>Open PuneTraffic from the Home Screen</li>
+      </ol>
+      <p class="mute-note">Takes 10 seconds. No app download.</p>
+    `,
+    actions: [
+      { label: "Got it", type: "primary" }
+    ]
+  });
+}
+
+
+
+
+function showModal({ title, body, actions = [] }) {
+  // Remove existing modal if any
+  const existing = document.getElementById("pt-modal");
+  if (existing) existing.remove();
+
+  const modal = document.createElement("div");
+  modal.id = "pt-modal";
+  modal.innerHTML = `
+    <div class="pt-backdrop"></div>
+    <div class="pt-modal-box">
+      <h3>${title}</h3>
+      <div class="pt-modal-body">${body}</div>
+      <div class="pt-modal-actions"></div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const actionsContainer = modal.querySelector(".pt-modal-actions");
+
+  actions.forEach(({ label, type = "secondary", onClick }) => {
+    const btn = document.createElement("button");
+    btn.textContent = label;
+    btn.className = `pt-btn ${type}`;
+       btn.onclick = () => {
+        onClick?.();
+        modal.remove();
+      };
+
+      modal.querySelector(".pt-backdrop").onclick = () => {
+        modal.remove();
+        resolve?.(false); // if exposed
+      };
+    actionsContainer.appendChild(btn);
+  });
+
+  modal.querySelector(".pt-backdrop").onclick = () => modal.remove();
+}
+
