@@ -287,7 +287,7 @@ ${STYLESHEET}
     We alert you <strong>only when Pune roads actually jam</strong> — not for small slowdowns.<br>
     Daytime alerts (9 AM – 6 PM). <strong>No login. No spam.</strong><br>
     <span class="mute-note">🔕 Mute for today anytime from the notification.</span><br>
-    <a href="#" onclick="showDemoNotification(); return false;">🔔 See example traffic alert</a>
+    <a href="#" onclick="showDemoNotification(); return false;" style="color: white;">🔔 See example traffic alert</a>
   </p>
 </header>
 
