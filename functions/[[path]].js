@@ -945,6 +945,9 @@ footer {
   box-shadow: 0 10px 30px rgba(0,0,0,0.35);
   z-index: 10001;
   transition: top 0.4s ease;
+  border: solid;
+  border-color: white;
+  border-width: 1px;
 }
 
 .demo-notification.show {
