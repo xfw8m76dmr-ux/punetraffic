@@ -936,7 +936,7 @@ footer {
   top: -120px;
   left: 50%;
   transform: translateX(-50%);
-  width: calc(100% - 24px);
+  width: calc(100% - 44px);
   max-width: 380px;
   background: #111827;
   color: #e5e7eb;
